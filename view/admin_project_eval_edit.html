@@ -1,0 +1,349 @@
+{% extends "./admin_base.html" %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-12">
+    <form action="/admin/project_eval_edit" method="post" class="form-horizontal">
+      <input type="hidden" name="id" value="{{item.id}}">
+      <input type="hidden" name="oper" value="{{'edit' if item.id else 'add'}}">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="panel-title">考评信息</div>
+        </div>
+        <div class="panel-body bt">
+          <div class="form-group">
+            <label class="col-sm-2 control-label">项目名称</label>
+            <div class="col-sm-10">
+              <select name="project_id" class="chosen-select input-md form-control" data-placeholder="请选择一个项目">
+                <option value=""></option>
+                {% for o in projectList %}
+                <option value="{{o.id}}" {{'selected' if item.project_id==o.id}}>{{o.name}}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label">被考评单位</label>
+            <div class="col-sm-10">
+              <select name="company_id" class="chosen-select input-md form-control" data-placeholder="请选择一个被考评单位">
+                <option value=""></option>
+                {% for o in companyList %}
+                <option value="{{o.id}}" data-type="{{o.type}}" {{'selected' if item.company_id==o.id}}>{{o.name}}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="form-group show-on-sj">
+            <label class="col-sm-2 control-label">设计质量</label>
+            <div class="col-sm-10">
+              <input name="sjzl" value="{{item.sjzl}}" type="text" class="form-control">
+            </div>
+          </div>
+          <div class="form-group show-on-sj">
+            <label class="col-sm-2 control-label">后期服务</label>
+            <div class="col-sm-10">
+              <input name="hqfw" value="{{item.hqfw}}" type="text" class="form-control">
+            </div>
+          </div>
+          <div class="form-group show-on-sj">
+            <label class="col-sm-2 control-label">变更设计</label>
+            <div class="col-sm-10">
+              <input name="bgsj" value="{{item.bgsj}}" type="text" class="form-control">
+            </div>
+          </div>
+
+          <div class="form-group show-on-sg">
+            <label class="col-sm-2 control-label mt">人员到位率</label>
+            <div class="col-sm-10">
+              <div class="row">
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">项目经理</span>
+                  <input name="rydwl_sg_1" value="{{item.rydwl_sg_1}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">技术负责人</span>
+                  <input name="rydwl_sg_2" value="{{item.rydwl_sg_2}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">施工员</span>
+                  <input name="rydwl_sg_3" value="{{item.rydwl_sg_3}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">质检员</span>
+                  <input name="rydwl_sg_4" value="{{item.rydwl_sg_4}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">安全员</span>
+                  <input name="rydwl_sg_5" value="{{item.rydwl_sg_5}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">材料员</span>
+                  <input name="rydwl_sg_6" value="{{item.rydwl_sg_6}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">资料员</span>
+                  <input name="rydwl_sg_7" value="{{item.rydwl_sg_7}}" type="text" class="form-control">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group show-on-sg">
+            <label class="col-sm-2 control-label">文明工地</label>
+            <div class="col-sm-10">
+              <input name="wmsg" value="{{item.wmsg}}" type="text" class="form-control">
+            </div>
+          </div>
+          <div class="form-group show-on-sg">
+            <label class="col-sm-2 control-label mt">安全生产</label>
+            <div class="col-sm-10">
+              <div class="row">
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">安全帽</span>
+                  <input name="aqsc_aqm" value="{{item.aqsc_aqm}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">安全网</span>
+                  <input name="aqsc_aqw" value="{{item.aqsc_aqw}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">安全保险</span>
+                  <input name="aqsc_aqbx" value="{{item.aqsc_aqbx}}" type="text" class="form-control">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group show-on-sg">
+            <label class="col-sm-2 control-label">施工日志</label>
+            <div class="col-sm-10">
+              <input name="sgrz" value="{{item.sgrz}}" type="text" class="form-control">
+            </div>
+          </div>
+          <div class="form-group show-on-sg">
+            <label class="col-sm-2 control-label mt">工程质量</label>
+            <div class="col-sm-10">
+              <div class="row">
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">企业自检</span>
+                  <input name="gczl_qyzj" value="{{item.gczl_qyzj}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">监理抽检</span>
+                  <input name="gczl_jlcj" value="{{item.gczl_jlcj}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">第三方检测</span>
+                  <input name="gczl_dsfjc" value="{{item.gczl_dsfjc}}" type="text" class="form-control">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group show-on-sg">
+            <label class="col-sm-2 control-label">质量评定</label>
+            <div class="col-sm-10">
+              <input name="zlpd" value="{{item.zlpd}}" type="text" class="form-control">
+            </div>
+          </div>
+          <div class="form-group show-on-sg">
+            <label class="col-sm-2 control-label">施工总结</label>
+            <div class="col-sm-10">
+              <input name="gzzj" value="{{item.gzzj}}" type="text" class="form-control">
+            </div>
+          </div>
+          <div class="form-group show-on-jl">
+            <label class="col-sm-2 control-label mt">人员到位率</label>
+            <div class="col-sm-10">
+              <div class="row">
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">总监</span>
+                  <input name="rydwl_jl_1" value="{{item.rydwl_jl_1}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">监理工程师</span>
+                  <input name="rydwl_jl_2" value="{{item.rydwl_jl_2}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">监理员</span>
+                  <input name="rydwl_jl_3" value="{{item.rydwl_jl_3}}" type="text" class="form-control">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group show-on-jl">
+            <label class="col-sm-2 control-label">大纲</label>
+            <div class="col-sm-10">
+              <input name="dg" value="{{item.dg}}" type="text" class="form-control">
+            </div>
+          </div>
+          <div class="form-group show-on-jl">
+            <label class="col-sm-2 control-label">细则</label>
+            <div class="col-sm-10">
+              <input name="xz" value="{{item.xz}}" type="text" class="form-control">
+            </div>
+          </div>
+          <div class="form-group show-on-jl">
+            <label class="col-sm-2 control-label">监理日志</label>
+            <div class="col-sm-10">
+              <input name="jlrz" value="{{item.jlrz}}" type="text" class="form-control">
+            </div>
+          </div>
+          <div class="form-group show-on-jl">
+            <label class="col-sm-2 control-label">检测设备配置清单</label>
+            <div class="col-sm-10">
+              <input name="jcsbpzqd" value="{{item.jcsbpzqd}}" type="text" class="form-control">
+            </div>
+          </div>
+          <div class="form-group show-on-jl">
+            <label class="col-sm-2 control-label mt">监理抽检结果上传</label>
+            <div class="col-sm-10">
+              <div class="row">
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">原材料</span>
+                  <input name="jlcjjgsc_ycl" value="{{item.jlcjjgsc_ycl}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">中间产品</span>
+                  <input name="jlcjjgsc_zjcp" value="{{item.jlcjjgsc_zjcp}}" type="text" class="form-control">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group show-on-jl">
+            <label class="col-sm-2 control-label">监理总结</label>
+            <div class="col-sm-10">
+              <input name="jlzj" value="{{item.jlzj}}" type="text" class="form-control">
+            </div>
+          </div>
+          <div class="form-group show-on-jc">
+            <label class="col-sm-2 control-label mt">全面性</label>
+            <div class="col-sm-10">
+              <div class="row">
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">原材料</span>
+                  <input name="qmx_ycl" value="{{item.qmx_ycl}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">中间产品</span>
+                  <input name="qmx_zjcp" value="{{item.qmx_zjcp}}" type="text" class="form-control">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group show-on-ztbdl">
+            <label class="col-sm-2 control-label mt">专业人员配备数量</label>
+            <div class="col-sm-10">
+              <div class="row">
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">甲级</span>
+                  <input name="zyrypbsl_1" value="{{item.zyrypbsl_1}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">乙级</span>
+                  <input name="zyrypbsl_2" value="{{item.zyrypbsl_2}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">暂定级</span>
+                  <input name="zyrypbsl_3" value="{{item.zyrypbsl_3}}" type="text" class="form-control">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group show-on-ztbdl">
+            <label class="col-sm-2 control-label">业务水平</label>
+            <div class="col-sm-10">
+              <input name="ywsp" value="{{item.ywsp}}" type="text" class="form-control">
+            </div>
+          </div>
+          <div class="form-group show-on-ztbdl">
+            <label class="col-sm-2 control-label">遵守职业纪律</label>
+            <div class="col-sm-10">
+              <input name="zszyjl" value="{{item.zszyjl}}" type="text" class="form-control">
+            </div>
+          </div>
+          <div class="form-group show-on-ztbdl">
+            <label class="col-sm-2 control-label">服务质量</label>
+            <div class="col-sm-10">
+              <input name="fwzl" value="{{item.fwzl}}" type="text" class="form-control">
+            </div>
+          </div>
+        </div>
+        <div class="panel-footer text-center">
+          <button type="submit" class="btn btn-info"><em class="fa fa-check fa-fw"></em>{{'保存' if item.id else '添加'}}</button>
+          <a href="javascript:history.go(-1)" class="btn btn-default"><em class="fa fa-close fa-fw"></em>取消</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="/static/vendor/chosen_v1.2.0/chosen.jquery.min.js"></script>
+<script src="/static/vendor/parsleyjs/dist/parsley.min.js"></script>
+<script src="/static/vendor/parsleyjs/dist/i18n/zh_cn.js"></script>
+<script src="/static/vendor/sweetalert/dist/sweetalert.min.js"></script>
+<script src="/static/vendor/bootstrap-filestyle/src/bootstrap-filestyle.js"></script>
+<script>
+$(function(){
+  $('.show-on-sj,.show-on-sg,.show-on-jl,.show-on-jc,.show-on-ztbdl').hide();
+  $('[name=company_id]').on('change',function(){
+    var $option = $(this.options[this.selectedIndex]);
+    var type = $option.data('type');
+    if(type == '设计'){
+      $('.show-on-sg,.show-on-jl,.show-on-jc,.show-on-ztbdl').hide();
+      $('.show-on-sj').show();
+    }else if(type == '施工'){
+      $('.show-on-sj,.show-on-jl,.show-on-jc,.show-on-ztbdl').hide();
+      $('.show-on-sg').show();
+    }else if(type == '监理'){
+      $('.show-on-sj,.show-on-sg,.show-on-jc,.show-on-ztbdl').hide();
+      $('.show-on-jl').show();
+    }else if(type == '检测'){
+      $('.show-on-sj,.show-on-sg,.show-on-jl,.show-on-ztbdl').hide();
+      $('.show-on-jc').show();
+    }else if(type == '招投标代理'){
+      $('.show-on-sj,.show-on-sg,.show-on-jl,.show-on-jc').hide();
+      $('.show-on-ztbdl').show();
+    }else{
+      $('.show-on-sj,.show-on-sg,.show-on-jl,.show-on-jc,.show-on-ztbdl').hide();
+    }
+  });
+  $('.chosen-select').chosen({
+    no_results_text: '没有结果'
+  }).trigger('change');
+
+  $('.filestyle').filestyle();
+  $('form').parsley().on('form:submit', function(){
+    var $form = this.$element;
+    var data = _.reduce($form.serializeArray(), function(result, o) {
+      result[o.name] = o.value;
+      return result;
+    }, {});
+
+    var url = $form.attr('action');
+    var type = $form.attr('method');
+    $.ajax({
+      url: url,
+      type: type,
+      data: data,
+      success: function(resp) {
+        if (resp.errno == 0) {
+          swal({title:'操作成功！',type:'success'},function () {
+            setTimeout(function(){
+              history.go(-1);
+            },100);
+          });
+        } else {
+          alert(resp.errmsg);
+        }
+      }
+    });
+    return false;
+  });
+});
+</script>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="/static/vendor/chosen_v1.2.0/chosen.min.css">
+<link rel="stylesheet" href="/static/vendor/sweetalert/dist/sweetalert.css">
+{% endblock %}

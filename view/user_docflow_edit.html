@@ -1,0 +1,215 @@
+{% extends "./user_base.html" %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-12">
+    <form action="/user/docflow_edit" method="post" class="form-horizontal">
+      <input type="hidden" name="id" value="{{item.id}}">
+      <input type="hidden" name="oper" value="{{'edit' if item.id else 'add'}}">
+      <input value="{{pageConfig.user.id}}" name="user_id" type="hidden">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="panel-title">发文信息</div>
+        </div>
+        <div class="panel-body bt">
+
+          <div class="form-group">
+            <label class="col-sm-2 control-label pr0">收件人</label>
+            <div class="col-sm-10">
+              <select name="to_user_id" class="chosen-select input-md form-control" multiple data-placeholder="请选择一个接收人">
+                <option value=""></option>
+                {% for o in userList %}
+                <option value="{{o.id}}">{{o.name}}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-sm-2 control-label pr0">标题</label>
+            <div class="col-sm-10">
+              <input value="{{item.name}}" name="name" type="text" class="form-control">
+            </div>
+          </div>
+
+
+          <div class="form-group">
+            <label class="col-sm-2 control-label pr0">联系电话</label>
+            <div class="col-sm-10">
+              <input value="{{item.mobile}}" name="mobile" type="text" class="form-control">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-sm-2 control-label pr0">备注</label>
+            <div class="col-sm-10">
+              <div id="summernote">
+                {{item.content | safe}}
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-sm-2 control-label pr0">附件</label>
+            <div class="col-sm-10 attach-list">
+              {% for o in attachList %}
+              <div class="btn-group mb-sm attach-item">
+                <input type="hidden" name="attach_id" value="{{o.id}}">
+                <button type="button" data-toggle="dropdown" class="btn dropdown-toggle btn-default">
+                  <em class="fa fa-paperclip fa-fw"></em> {{o.name}} <span class="caret"></span>
+                </button>
+                <ul role="menu" class="dropdown-menu">
+                  <li><a href="/user/download?id={{o.id}}"><em class="fa fa-download fa-fw"></em> <span>下载</span></a></li>
+                  <li><a class="btn-delete" href="javascript:;"><em class="fa fa-trash fa-fw"></em> <span>删除</span></a></li>
+                </ul>
+              </div>
+              {% endfor %}
+              <div class="mb-sm btn btn-info inline fileinput-button" data-url="/user/upload" data-name="attach_id">
+                <em class="fa fa-plus fa-fw"></em><span>上传文档</span> <span id="pn"></span>
+                <input type="file" name="files[]" multiple>
+              </div>
+              <div class="pull-right mr-xl">
+                <button type="submit" class="ml-xl mb-sm btn btn-info"><em class="fa fa-check fa-fw"></em>{{'保存' if item.id else '发送'}}</button>
+                <a href="javascript:history.go(-1)" class="mb-sm btn btn-default"><em class="fa fa-close fa-fw"></em>取消</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="/static/vendor/chosen_v1.2.0/chosen.jquery.min.js"></script>
+<script src="/static/vendor/parsleyjs/dist/parsley.min.js"></script>
+<script src="/static/vendor/parsleyjs/dist/i18n/zh_cn.js"></script>
+<script src="/static/vendor/sweetalert/dist/sweetalert.min.js"></script>
+<script src="/static/vendor/jquery-ui/ui/widget.js"></script>
+<script src="/static/vendor/blueimp-file-upload/js/jquery.fileupload.js"></script>
+<script src="/static/vendor/summernote/summernote.js"></script>
+<script src="/static/vendor/summernote/lang/summernote-zh-CN.js"></script>
+<script>
+$(function(){
+  $('.chosen-select').chosen({
+    no_results_text: '没有结果'
+  });
+  $('.chosen-select-deselect').chosen({
+    no_results_text: '没有结果',
+    allow_single_deselect:true
+  });
+
+  var updateSelect = function($select){
+    var value = $select.data('value');
+    if(!value) return;
+    var level = $select.data('level');
+    var group = $select.data('group');
+
+    var pvalue = $('option[value='+value+']', $select).data('parent-id');
+    if(pvalue){
+      $('option[data-parent-id='+pvalue+']', $select).show();
+    }
+    $select.val(value);
+    $select.trigger("chosen:updated");
+
+    var $parent = $('select[data-group='+group+'][data-level='+(level-1)+']');
+
+    if($parent.size()){
+      $parent.data('value', pvalue);
+      updateSelect($parent);
+    }
+  }
+  $('select[data-group][data-level] option[data-parent-id]').hide();
+  $('select[data-group][data-level]').trigger("chosen:updated");
+  $('select[data-group][data-level][data-value]').each(function(){
+    updateSelect($(this));
+  });
+  $('select[data-group][data-level]').on('change', function(){
+    var $this = $(this);
+    var value = $this.val();
+    var level = $this.data('level');
+    var group = $this.data('group');
+
+    var $child = $('select[data-group='+group+'][data-level='+(level-0+1)+']');
+    $('option', $child).hide();
+    if(value){
+      console.log(value);
+      $('option[data-parent-id='+value+']', $child).show();
+    }
+    $child.val('');
+    $child.trigger("chosen:updated");
+  });
+
+  $('.attach-list').on('click', '.btn-delete', function(){
+    $(this).parents('.attach-item').remove();
+  });
+
+  $('.fileinput-button').fileupload({
+    done: function(e, data){
+      var $this = $(this);
+      var result = data.result;
+      var name = $this.data('name');
+
+      _.forEach(result.data, function(o){
+        $this.before(''
+          + '<div class="btn-group mb-sm attach-item">'
+          +   '<input type="hidden" name="attach_id" value="'+o.id+'">'
+          +   '<button type="button" data-toggle="dropdown" class="btn dropdown-toggle btn-default">'
+          +     '<em class="fa fa-paperclip fa-fw"></em>' + o.name + ' <span class="caret"></span>'
+          +   '</button>'
+          +   '<ul role="menu" class="dropdown-menu">'
+          +     '<li><a href="/user/download?id='+o.id+'"><em class="fa fa-download fa-fw"></em> <span>下载</span></a></li>'
+          +     '<li><a class="btn-delete" href="javascript:;"><em class="fa fa-trash fa-fw"></em> <span>删除</span></a></li>'
+          +   '</ul>'
+          + '</div>'
+        );
+      });
+    }
+  }).on('fileuploadprogressall', function(e, data){
+    var val = data.loaded / data.total;
+    var str = val>=1 ? '' : (val * 100).toFixed(2)+'%';
+    $('#pn').html(str);
+  });
+
+  var $content = $('#summernote').summernote({lang:'zh-CN',dialogsInBody:true,minHeight:150});
+
+  $('form').parsley().on('form:submit', function(){
+    var $form = this.$element;
+    var data = _.reduce($form.serializeArray(), function(result, o) {
+      if(!result[o.name]) result[o.name] = o.value;
+      else result[o.name] = result[o.name] + ',' + o.value;
+      return result;
+    }, {});
+    data.content = $content.summernote('code');
+
+    var url = $form.attr('action');
+    var type = $form.attr('method');
+    $.ajax({
+      url: url,
+      type: type,
+      data: data,
+      success: function(resp) {
+        if (resp.errno == 0) {
+          swal({title:'操作成功！',type:'success'},function () {
+            setTimeout(function(){
+              history.go(-1);
+            },100);
+          });
+        } else {
+          alert(resp.errmsg);
+        }
+      }
+    });
+    return false;
+  });
+});
+</script>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="/static/vendor/chosen_v1.2.0/chosen.min.css">
+<link rel="stylesheet" href="/static/vendor/sweetalert/dist/sweetalert.css">
+<link rel="stylesheet" href="/static/vendor/blueimp-file-upload/css/jquery.fileupload.css">
+<link rel="stylesheet" href="/static/vendor/summernote/summernote.css" >
+{% endblock %}

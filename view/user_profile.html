@@ -1,0 +1,91 @@
+{% extends "./user_base.html" %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-12">
+
+    <form action="/user/profile" method="post" class="form-horizontal">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="panel-title">个人信息</div>
+        </div>
+        <div class="panel-body bt">
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group row">
+                <label class="col-sm-4 control-label pr0">姓名</label>
+                <div class="col-sm-8">
+                  <input name="name" value="{{item.name}}" type="text" class="form-control" readonly>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group row">
+                <label class="col-sm-2 control-label pr0">性别</label>
+                <div class="col-sm-10">
+                  <label class="radio-inline c-radio">
+                    <input name="sex" type="radio"  value="男" {{'checked' if item.sex=='男'}} disabled>
+                    <span class="fa fa-male"></span>男
+                  </label>
+                  <label class="radio-inline c-radio">
+                    <input name="sex" type="radio" value="女" {{'checked' if item.sex=='女'}} disabled>
+                    <span class="fa fa-female"></span>女
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group row">
+                <label class="col-sm-4 control-label pr0">身份证号码</label>
+                <div class="col-sm-8">
+                  <input name="idno" value="{{item.idno}}" type="text" class="form-control" readonly>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group row">
+                <label class="col-sm-2 control-label pr0">职务</label>
+                <div class="col-sm-10">
+                  <input name="job" value="{{item.job}}" type="text" class="form-control" readonly>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group row">
+                <label class="col-sm-4 control-label pr0">职称</label>
+                <div class="col-sm-8">
+                  <input name="title" value="{{item.title}}" type="text" class="form-control" readonly>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group row">
+                <label class="col-sm-2 control-label pr0">联系号码</label>
+                <div class="col-sm-10">
+                  <input name="mobile" value="{{item.mobile}}" type="text" class="form-control" readonly>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group row">
+                <label class="col-sm-4 control-label pr0">密码</label>
+                <div class="col-sm-8">
+                  <p class="form-control-static"><a href="/user/password">修改密码</a></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

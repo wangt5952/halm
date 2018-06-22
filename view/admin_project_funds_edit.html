@@ -1,0 +1,428 @@
+{% extends "./admin_base.html" %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-12">
+    <form action="/admin/project_funds_edit" method="post" class="form-horizontal">
+      <input type="hidden" name="id" value="{{item.id}}">
+      <input type="hidden" name="oper" value="{{'edit' if item.id else 'add'}}">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="panel-title">项目信息</div>
+        </div>
+        <div class="panel-body bt">
+          <div class="form-group">
+            <label class="col-sm-2 control-label">项目名称</label>
+            <div class="col-sm-10">
+              <select name="project_id" class="chosen-select input-md form-control" data-placeholder="请选择一个项目">
+                <option value=""></option>
+                {% for o in projectList %}
+                <option value="{{o.id}}" {{'selected' if item.project_id==o.id}}>{{o.name}}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label">投资计划文件</label>
+            <div class="col-sm-10">
+               <input type="file" data-buttonText="选择文件" data-classbutton="btn btn-default" data-classinput="form-control inline" class="form-control filestyle">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label">总投资</label>
+            <div class="col-sm-10">
+              <div class="row">
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">中央</span>
+                  <input name="ztz_zhong" value="{{item.ztz_zhong}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">省级</span>
+                  <input name="ztz_sheng" value="{{item.ztz_sheng}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">市级</span>
+                  <input name="ztz_shi" value="{{item.ztz_shi}}" type="text"  class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">县区级</span>
+                  <input name="ztz_xian" value="{{item.ztz_xian}}" type="text" class="form-control">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label">资金到位金额
+              <br>
+              <button type="button" class="btn btn-info btn-xs btn-add-row">添加</button>
+            </label>
+            <div class="col-sm-10">
+              <table id="zjdwje" class="table add-table">
+                <thead>
+                  <tr>
+                    <th class="text-center small pb0">中央</th>
+                    <th class="text-center small pb0">省级</th>
+                    <th class="text-center small pb0">县区</th>
+                    <th class="text-center small pb0">市级</th>
+                    <th class="text-center small pb0">时间</th>
+                  </tr>
+                </thead>
+                <tbody class="text-center">
+                  {% for p in item.zjdwje%}
+                  <tr>
+                    <td><input type="text" value="{{p.zhong}}" class="form-control"></td>
+                    <td><input type="text" value="{{p.sheng}}" class="form-control"></td>
+                    <td><input type="text" value="{{p.xian}}" class="form-control"></td>
+                    <td><input type="text" value="{{p.shi}}" class="form-control"></td>
+                    <td><input type="text" value="{{p.time}}" class="form-control datetimepicker" autocomplete="off" data-date-format="yyyy-mm-dd" data-min-view="month"></td>
+                  </tr>
+                  {% else %}
+                  <tr>
+                    <td><input type="text" class="form-control"></td>
+                    <td><input type="text" class="form-control"></td>
+                    <td><input type="text" class="form-control"></td>
+                    <td><input type="text" class="form-control"></td>
+                    <td><input type="text" class="form-control datetimepicker" autocomplete="off" data-date-format="yyyy-mm-dd" data-min-view="month"></td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label">计量申请金额
+              <br>
+              <button type="button" class="btn btn-info btn-xs btn-add-row">添加</button>
+            </label>
+            <div class="col-sm-10">
+              <table  id="jlsqje" class="table add-table">
+                <thead>
+                  <tr>
+                    <th class="text-center small pb0">日期</th>
+                    <th class="text-center small pb0">标段</th>
+                    <th class="text-center small pb0">金额</th>
+                  </tr>
+                </thead>
+                <tbody class="text-center">
+                  {% for p in item.jlsqje%}
+                  <tr>
+                    <td><input type="text" value="{{p.time}}" class="form-control datetimepicker" autocomplete="off" data-date-format="yyyy-mm-dd" data-min-view="month"></td>
+                    <td><input type="text" value="{{p.bd}}" class="form-control"></td>
+                    <td><input type="text" value="{{p.je}}" class="form-control"></td>
+                  </tr>
+                  {% else %}
+                  <tr>
+                    <td><input type="text" class="form-control datetimepicker" autocomplete="off" data-date-format="yyyy-mm-dd" data-min-view="month"></td>
+                    <td><input type="text" class="form-control"></td>
+                    <td><input type="text" class="form-control"></td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label">支付金额
+              <br>
+              <button type="button" class="btn btn-info btn-xs btn-add-row">添加</button>
+            </label>
+            <div class="col-sm-10">
+              <table id="zfje" class="table add-table">
+                <thead>
+                  <tr>
+                    <th class="text-center small pb0">日期</th>
+                    <th class="text-center small pb0">标段</th>
+                    <th class="text-center small pb0">金额</th>
+                  </tr>
+                </thead>
+                <tbody class="text-center">
+                  {% for p in item.zfje%}
+                  <tr>
+                    <td><input type="text" value="{{p.time}}" class="form-control datetimepicker" autocomplete="off" data-date-format="yyyy-mm-dd" data-min-view="month"></td>
+                    <td><input type="text" value="{{p.bd}}" class="form-control"></td>
+                    <td><input type="text" value="{{p.je}}" class="form-control"></td>
+                  </tr>
+                  {% else %}
+                  <tr>
+                    <td><input type="text" class="form-control datetimepicker" autocomplete="off" data-date-format="yyyy-mm-dd" data-min-view="month"></td>
+                    <td><input type="text" class="form-control"></td>
+                    <td><input type="text" class="form-control"></td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label">独立费用</label>
+            <div class="col-sm-10">
+              <div class="row">
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">市级建管费</span>
+                  <input name="jgf_shi" value="{{item.jgf_shi}}" type="text" class="form-control">
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">淮阴区建管费</span>
+                  <input name="jgf_xian_1" value="{{item.jgf_xian_1}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">涟水县建管费</span>
+                  <input name="jgf_xian_2" value="{{item.jgf_xian_2}}" type="text" class="form-control">
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">监理费</span>
+                  <input name="jlf" value="{{item.jlf}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">设计费</span>
+                  <input name="sjf" value="{{item.sjf}}" type="text" class="form-control">
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">淮阴区拆赔费</span>
+                  <input name="cpf_xian_1" value="{{item.cpf_xian_1}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">涟水县拆赔费</span>
+                  <input name="cpf_xian_2" value="{{item.cpf_xian_2}}" type="text" class="form-control">
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">淮阴区检测费</span>
+                  <input name="jcf_xian_1" value="{{item.jcf_xian_1}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">涟水县检测费</span>
+                  <input name="jcf_xian_2" value="{{item.jcf_xian_2}}" type="text" class="form-control">
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">咨询费</span>
+                  <input name="zxf" value="{{item.zxf}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">审计费</span>
+                  <input name="sjf" value="{{item.sjf}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">其他</span>
+                  <input name="qt" value="{{item.qt}}" type="text" class="form-control">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-sm-2 control-label">结余资金</label>
+            <div class="col-sm-10">
+              <input name="jyje" value="{{item.jyje}}" type="text" class="form-control" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label">预备费</label>
+            <div class="col-sm-10">
+              <input name="ybf" value="{{item.ybf}}" type="text" class="form-control" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label mt">概算价</label>
+            <div class="col-sm-10">
+              <div class="row">
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">标段1</span>
+                  <input name="hsj_bian_1" value="{{item.hsj_bian_1}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">标段2</span>
+                  <input name="hsj_bian_2" value="{{item.hsj_bian_2}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">标段3</span>
+                  <input name="hsj_bian_3" value="{{item.hsj_bian_3}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">标段4</span>
+                  <input name="hsj_bian_4" value="{{item.hsj_bian_4}}" type="text" class="form-control">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label mt">合同价</label>
+            <div class="col-sm-10">
+              <div class="row">
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">标段1</span>
+                  <input name="htj_bian_1" value="{{item.htj_bian_1}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">标段2</span>
+                  <input name="htj_bian_2" value="{{item.htj_bian_2}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">标段3</span>
+                  <input name="htj_bian_3" value="{{item.htj_bian_3}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">标段4</span>
+                  <input name="htj_bian_4" value="{{item.htj_bian_4}}" type="text" class="form-control">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label mt">实际支付</label>
+            <div class="col-sm-10">
+              <div class="row">
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">标段1</span>
+                  <input name="sjzf_bian_1" value="{{item.sjzf_bian_1}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">标段2</span>
+                  <input name="sjzf_bian_2" value="{{item.sjzf_bian_2}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">标段3</span>
+                  <input name="sjzf_bian_3" value="{{item.sjzf_bian_3}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">标段4</span>
+                  <input name="sjzf_bian_4" value="{{item.sjzf_bian_4}}" type="text" class="form-control">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label mt">结余金额</label>
+            <div class="col-sm-10">
+              <div class="row">
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">标段1</span>
+                  <input name="jyje_bian_1" value="{{item.jyje_bian_1}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">标段2</span>
+                  <input name="jyje_bian_2" value="{{item.jyje_bian_2}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">标段3</span>
+                  <input name="jyje_bian_3" value="{{item.jyje_bian_3}}" type="text" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <span class="small help-block mb0 text-center">标段4</span>
+                  <input name="jyje_bian_4" value="{{item.jyje_bian_4}}" type="text" class="form-control">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="panel-footer text-center">
+          <button type="submit" class="btn btn-info"><em class="fa fa-check fa-fw"></em>{{'保存' if item.id else '添加'}}</button>
+          <a href="javascript:history.go(-1)" class="btn btn-default"><em class="fa fa-close fa-fw"></em>取消</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="/static/vendor/chosen_v1.2.0/chosen.jquery.min.js"></script>
+<script src="/static/vendor/parsleyjs/dist/parsley.min.js"></script>
+<script src="/static/vendor/parsleyjs/dist/i18n/zh_cn.js"></script>
+<script src="/static/vendor/sweetalert/dist/sweetalert.min.js"></script>
+<script src="/static/vendor/bootstrap-filestyle/src/bootstrap-filestyle.js"></script>
+<script src="/static/vendor/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+<script src="/static/vendor/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+<script>
+$(function(){
+  $('.datetimepicker').datetimepicker({language:'zh-CN',autoclose:true,fontAwesome:true});
+  $('.chosen-select').chosen({
+    no_results_text: '没有结果'
+  });
+  $('.filestyle').filestyle();
+
+  $('.btn-add-row').click(function(){
+    var $group = $(this).parents('.form-group');
+    var $table = $group.find('.add-table');
+
+    var row = $('tbody tr:first', $table).clone();
+    $('input', row).val('');
+    $('.datetimepicker', row).datetimepicker({language:'zh-CN',autoclose:true,fontAwesome:true});
+    $('tbody', $table).append(row);
+
+  })
+  $('form').parsley().on('form:submit', function(){
+    var $form = this.$element;
+    var data = _.reduce($form.serializeArray(), function(result, o) {
+      result[o.name] = o.value;
+      return result;
+    }, {});
+
+    data.jsonContent = {};
+    data.jsonContent.zjdwje = _.map($('#zjdwje tbody tr').toArray(), function(o){
+      var $input = $('input', o);
+      return {
+        zhong: $input.eq(0).val(),
+        sheng: $input.eq(1).val(),
+        shi: $input.eq(2).val(),
+        xian: $input.eq(3).val(),
+        time: $input.eq(4).val()
+      }
+    });
+    data.jsonContent.jlsqje = _.map($('#jlsqje tbody tr').toArray(), function(o){
+      var $input = $('input', o);
+      return {
+        time: $input.eq(0).val(),
+        bd: $input.eq(1).val(),
+        je: $input.eq(2).val()
+      }
+    });
+    data.jsonContent.zfje = _.map($('#zfje tbody tr').toArray(), function(o){
+      var $input = $('input', o);
+      return {
+        time: $input.eq(0).val(),
+        bd: $input.eq(1).val(),
+        je: $input.eq(2).val()
+      }
+    });
+    data.jsonContent = JSON.stringify(data.jsonContent);
+
+    var url = $form.attr('action');
+    var type = $form.attr('method');
+    $.ajax({
+      url: url,
+      type: type,
+      data: data,
+      success: function(resp) {
+        if (resp.errno == 0) {
+          swal({title:'操作成功！',type:'success'},function () {
+            setTimeout(function(){
+              history.go(-1);
+            },100);
+          });
+        } else {
+          alert(resp.errmsg);
+        }
+      }
+    });
+    return false;
+  });
+});
+</script>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="/static/vendor/chosen_v1.2.0/chosen.min.css">
+<link rel="stylesheet" href="/static/vendor/sweetalert/dist/sweetalert.css">
+<link rel="stylesheet" href="/static/vendor/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+{% endblock %}

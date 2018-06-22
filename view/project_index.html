@@ -1,0 +1,209 @@
+{% extends "./project_base.html" %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-md-8">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        项目管理资料
+      </div>
+      <div class="list-group bt">
+        {% for o in archiveList %}
+        <div class="list-group-item">
+          <div class="media-box">
+            <div class="pull-left">
+              <span class="fa-stack">
+                <em class="fa fa-circle fa-stack-2x {{o.color}}"></em>
+                <em class="fa {{o.icon}} fa-stack-1x fa-inverse text-white"></em>
+              </span>
+            </div>
+            <div class="media-box-body clearfix">
+              <div class="media-box-heading"><a href="/project/archive?id={{o.id}}" class="{{o.color}} m0">{{o.name}}</a>
+              </div>
+              <p class="m0">
+                {% for p in o.children %}
+                <small><a class="ph-sm" href="/project/archive?id={{p.id}}">{{p.name}}</a></small>
+                {% endfor %}
+              </p>
+
+            </div>
+          </div>
+        </div>
+        {% else %}
+        <div class="list-group-item">
+          <div class="media-box">
+            <div class="media-box-body clearfix">
+              <div class="media-box-heading">
+                没有文档
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        主管部门及监督单位信息
+      </div>
+      <div class="panel-body bt">
+
+        <table class="table">
+          <tr>
+            <td width="180px" class="text-right">项目主管部门：</td>
+            <td>{{pageConfig.project.xmzgdw}}</td>
+          </tr>
+          <tr>
+            <td class="text-right">分管负责人：</td>
+            <td>{{pageConfig.project.xmfgdw}}</td>
+          </tr>
+          <tr>
+            <td class="text-right">业务负责人：</td>
+            <td>{{pageConfig.project.xmzcy}}</td>
+          </tr>
+          <tr>
+            <td class="text-right">质量监督单位：</td>
+            <td>{{pageConfig.project.zljddw}}</td>
+          </tr>
+          <tr>
+            <td class="text-right">安全监督单位：</td>
+            <td>{{pageConfig.project.aqjddw}}</td>
+          </tr>
+          <tr>
+            <td colspan="2"></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        参建单位及参建人员信息
+      </div>
+      <div class="panel-body bt">
+
+        <div role="tabpanel">
+          <ul role="tablist" class="nav nav-tabs">
+            <li role="presentation" class="active">
+              <a class="ph" href="#company_1" aria-controls="company_1" role="tab" data-toggle="tab">建设单位</a>
+            </li>
+            <li role="presentation">
+              <a class="ph" href="#company_2" aria-controls="company_2" role="tab" data-toggle="tab">勘测设计单位</a>
+            </li>
+            <li role="presentation">
+              <a class="ph" href="#company_3" aria-controls="company_3" role="tab" data-toggle="tab">监理单位</a>
+            </li>
+            <li role="presentation">
+              <a class="ph" href="#company_4" aria-controls="company_4" role="tab" data-toggle="tab">施工单位</a>
+            </li>
+            <li role="presentation">
+              <a class="ph" href="#company_5" aria-controls="company_5" role="tab" data-toggle="tab">第三方检测单位</a>
+            </li>
+            <li role="presentation">
+              <a class="ph" href="#company_6" aria-controls="company_6" role="tab" data-toggle="tab">设备供应单位</a>
+            </li>
+            <li role="presentation">
+              <a class="ph" href="#company_7" aria-controls="company_6" role="tab" data-toggle="tab">材料供应单位</a>
+            </li>
+          </ul>
+          <div class="tab-content p">
+
+            {% for i in ['js','sj','jl','sg','jc', 'shebei','cailiao'] %}
+            <div id="company_{{loop.index}}" role="tabpanel" class="tab-pane {{'active' if loop.index == 1}}">
+              {% for o in companyGroup[i] %}
+              <table class="table">
+                <tr>
+                  <td colspan="3"><b>{{o.role}}：{{o.company_name}}</b></td>
+                </tr>
+                {% for p in o.userList %}
+                {% if p.role %}
+                <tr>
+                  <td width="180px">{{p.role}}：{{p.user_name}}</td>
+                  <td width="180px">电话：{{p.user_mobile}}</td>
+                  <td>邮箱：{{p.user_email}}</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+                <tr>
+                  <td colspan="3"></td>
+                </tr>
+              </table>
+              {% endfor %}
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="panel panel-default">
+      <div class="panel-heading">项目管理流程
+        <a href="/project/workflow_edit?project_id={{pageConfig.project.id}}" class="btn btn-info btn-xs pull-right"><em class="fa fa-plus fa-fw"></em>申请流程</a>
+      </div>
+
+      <div class="panel-body bt">
+        {% if workflowList.length %}
+        <table class="table table-striped table-bordered table-hover">
+          <tbody>
+            {% for o in workflowList %}
+            <tr>
+              <td><a href="/project/workflow_reply?id={{o.id}}">{{o.name}}</a></td>
+              <td>
+                {% if o.status == 0 %}
+                通过
+                {% elif o.status == 1 %}
+                拒绝
+                {% else %}
+                处理中
+                {% endif %}
+              </td>
+              <td>{{o.create_time}}</td>
+            </tr>
+            {% endfor %}
+            <tr>
+              <td colspan="3" class="text-center"><a href="/project/workflow?project_id={{pageConfig.project.id}}">查看全部</a></td>
+            </tr>
+          </tbody>
+        </table>
+        {% else %}
+        没有流程
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="/static/vendor/sweetalert/dist/sweetalert.min.js"></script>
+<script>
+$(function(){
+  $('.btn-sign').click(function(){
+    var type = $(this).data('type');
+    var url = '/project/sign?project_id={{pageConfig.project.id}}';
+    $.ajax({
+      url: url,
+      type: 'post',
+      data: {type:type},
+      success: function(resp) {
+        if (resp.errno == 0) {
+          swal({title:'打卡成功！',type:'success'},function () {
+            setTimeout(function(){
+              window.location.reload();
+            },100);
+          });
+        } else {
+          alert(resp.errmsg);
+        }
+      }
+    });
+  })
+})
+</script>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="/static/vendor/sweetalert/dist/sweetalert.css">
+{% endblock %}

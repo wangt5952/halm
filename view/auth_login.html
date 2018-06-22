@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>登录 - {{config.app.name}}</title>
+
+  <link rel="stylesheet" href="/static/vendor/fontawesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/static/vendor/simple-line-icons/css/simple-line-icons.css">
+  <link rel="stylesheet" href="/static/css/bootstrap.css">
+  <link rel="stylesheet" href="/static/css/app.css">
+</head>
+
+<body>
+  <div style="position:absolute;top:50%;margin-top:-205px;width:100%;height:410px;">
+    <div class="container container-sm">
+      <div class="panel panel-info panel-flat">
+        <div class="panel-heading text-center">
+          <img src="/static/img/logo.png" class="thumb80 hidden-xs">
+          <span class="h2">{{config.app.name}}</span>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-sm-6 col-sm-offset-3">
+              <form action="/auth/login" method="post" role="form" class="mb-lg"name="ViKeyForm" id="ViKeyForm" >
+                <input type="hidden" name="ret" value="{{http.query.ret}}">
+                <div class="form-group has-feedback">
+                  <input id="account" name="account" type="text" placeholder="用户名/手机号/电子邮箱" autocomplete="off"  class="form-control">
+                  <input id="hid" name="hid" type="hidden" placeholder="加密狗硬件号" autocomplete="off" class="form-control">
+                  <span class="fa fa-envelope form-control-feedback text-muted"></span>
+                </div>
+                <div class="form-group has-feedback">
+                  <input name="password" type="password" placeholder="请输入登录密码" required class="form-control">
+                  <span class="fa fa-lock form-control-feedback text-muted"></span>
+                </div>
+                <div class="clearfix">
+                  <div class="checkbox c-checkbox pull-left mt0 hide">
+                    <label>
+                      <input type="checkbox" value="" name="remember">
+                      <span class="fa fa-check"></span>保持登录
+                    </label>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-block btn-primary mt-lg">登录</button>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="panel-footer text-center">
+          <span>&copy;</span>
+          <span>2016</span>
+          <span>-</span>
+          <span>淮安市水利局</span>
+          <br>
+          <span>江苏朗堃科技股份有限公司</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/vendor/modernizr/modernizr.custom.js"></script>
+  <script src="/static/vendor/jquery/dist/jquery.js"></script>
+  <script src="/static/vendor/bootstrap/dist/js/bootstrap.js"></script>
+  <script src="/static/vendor/jQuery-Storage-API/jquery.storageapi.js"></script>
+  <script src="/static/vendor/parsleyjs/dist/parsley.min.js"></script>
+  <script src="/static/vendor/parsleyjs/dist/i18n/zh_cn.js"></script>
+  <script src="/static/vendor/lodash/lodash.min.js"></script>
+  <script src="/static/vendor/backstretch/jquery.backstretch.min.js"></script>
+  <embed id="ViKeyInterface"  type="application/npViKeyInterface-plugin" style="height: 0;width: 0; "> </embed>
+  <script src="/static/js/app.js"></script>
+  <script language="JavaScript">
+      <!--
+      var ViKeyInterface;
+      var ViKeyCount;
+      function LoadViKeyInterface()
+      {
+      	try
+      	{
+      		 //创建ViKey加密狗控件
+      		if (document.implementation && document.implementation.createDocument && typeof XSLTProcessor != 'undefined')
+      		{
+      			// chrome, firefox etc
+      			//alert("Google");
+      			ViKeyInterface= document.getElementById('ViKeyInterface');
+      		}
+      		else
+      		{
+      			//alert("IE");
+      			ViKeyInterface=new ActiveXObject("ViKeyActiveX.ViKeyInterface.1");
+      		}
+      		ViKeyCount = ViKeyInterface.IVikeyFind();
+
+      	 }
+      	 catch(e)
+      	 {
+      		alert("没有安装ViKey加密狗网页控件, 请安装ViKey加密狗网页控件");
+      		return false;
+      	 }
+
+      	return true;
+      }
+
+      window.onload = function()
+      {
+      	LoadViKeyInterface();
+        CheckHasVikey()
+
+      }
+
+      function dogLogin()
+      {
+        var ViKeyIndex;
+      	ViKeyIndex = 0;
+        ViKeyInterface.IVikeyUserLogin(ViKeyIndex, "11111111");
+        var FM = window.document.ViKeyForm;
+      	var ViKeyCount;
+      	ViKeyCount = ViKeyInterface.IVikeyFind();
+      	if(ViKeyInterface.IViKeyGetError() ==0)
+      	{
+          var ViKeyIndex;
+        	var ViKeyHID;
+          var Addr = 0;
+	        var Length = 32;
+          var buffer="";
+
+          ViKeyIndex = 0;
+
+        	ViKeyHID = ViKeyInterface.IVikeyGetHID(ViKeyIndex);
+          buffer = ViKeyInterface.IVikeyReadData(ViKeyIndex, Addr, Length);
+        	if(ViKeyInterface.IViKeyGetError() == 0)
+        	{
+            $('input[name=account]').attr("disabled","true")
+            FM.account.value=buffer;
+            FM.hid.value=ViKeyHID;
+        	}
+      	}
+      }
+      function CheckHasVikey()
+      {
+      	var ViKeyIndex;
+      	var ViKeyHID;
+      	ViKeyIndex = 0;
+      	var newCount = ViKeyInterface.IVikeyFind();
+      	if(newCount == ViKeyCount)
+      	{
+          dogLogin();
+      	}
+      	else
+      	{
+            window.location.reload();
+      	}
+        setTimeout("CheckHasVikey();", 1000)
+      }
+    </script>
+  <script>
+
+  $(function(){
+    $.backstretch([
+      "/static/img/login-bg-11.jpg",
+      "/static/img/login-bg-22.jpg",
+      "/static/img/login-bg-33.jpg",
+      ], {
+        fade: 1000,
+        duration: 7000
+    });
+
+    $('form').parsley().on('form:submit', function(){
+      var $form = this.$element;
+      var data = _.reduce($form.serializeArray(), function(result, o) {
+        result[o.name] = o.value;
+        return result;
+      }, {});
+
+      var url = $form.attr('action');
+      var type = $form.attr('method');
+      $.ajax({
+        url: url,
+        type: type,
+        data: data,
+        success: function(resp) {
+          if (resp.errno == 0) {
+            if (resp.data.redirect) window.location.href = resp.data.redirect;
+          } else {
+            alert(resp.errmsg);
+          }
+        }
+      });
+      return false;
+    });
+  });
+  </script>
+</body>
+</html>

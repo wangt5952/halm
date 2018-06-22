@@ -1,0 +1,212 @@
+{% extends "./admin_base.html" %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-12">
+    <form action="/admin/task_edit" method="post" class="form-horizontal">
+      <input type="hidden" name="id" value="{{item.id}}">
+      <input type="hidden" name="oper" value="{{'edit' if item.id else 'add'}}">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="panel-title">任务信息</div>
+        </div>
+        <div class="panel-body bt">
+          <div class="form-group">
+            <label class="col-sm-2 control-label pr0">项目名称</label>
+            <div class="col-sm-10">
+              {% if pageConfig.project %}
+              <input value="{{pageConfig.project.name}}" type="text" class="form-control" readonly>
+              <input value="{{pageConfig.project.id}}" name="project_id" type="hidden">
+              {% else %}
+              <select name="project_id" class="chosen-select input-md form-control" data-placeholder="请选择一个项目">
+                <option value=""></option>
+                {% for o in projectList %}
+                <option value="{{o.id}}" {{'selected' if item.project_id==o.id}}>{{o.name}}</option>
+                {% endfor %}
+              </select>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-sm-2 control-label pr0">完成方式</label>
+            <div class="col-sm-10">
+              <select name="finish_type" class="chosen-select input-md form-control" data-placeholder="请选择一个完成方式">
+                <option value=""></option>
+                {% for o in [['上传文档', 'upload-archive'],['申请流程', 'apply-workflow']] %}
+                <option value="{{o[1]}}" {{'selected' if (item.finish_type or 'upload-archive')==o[1]}}>{{o[0]}}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group show-on-upload-archive">
+            <label class="col-sm-2 control-label pr0">文档路径</label>
+            <div class="col-sm-10">
+              <input name="params.archive_path" value="{{item.params.archive_path}}" type="text" class="form-control" placeholder="如：'/施工资料/施工日志'">
+            </div>
+          </div>
+
+          <div class="form-group show-on-apply-workflow">
+            <label class="col-sm-2 control-label pr0">流程类型</label>
+            <div class="col-sm-3" id="workflow_type_1_id_container">
+              <select data-group="workflow-type" data-level="1" class="chosen-select input-md form-control" data-placeholder="请选择一级类别" data-parsley-errors-container="#workflow_type_1_id_container .errors-container" data-parsley-class-handler="#workflow_type_1_id_container .chosen-single">
+                <option value=""></option>
+                {% for o in workflowTypeList %}
+                {% if not o.parent_id %}
+                  <option value="{{o.id}}">{{o.name}}</option>
+                {% endif %}
+                {% endfor %}
+              </select>
+              <div class="errors-container"></div>
+            </div>
+            <div class="col-sm-3" id="workflow_type_2_id_container">
+              <select name="params.workflow_type_id" data-group="workflow-type" data-level="2" data-value="{{item.params.workflow_type_id}}" class="chosen-select input-md form-control" data-placeholder="请选择二级类别" data-parsley-errors-container="#workflow_type_2_id_container .errors-container" data-parsley-class-handler="#workflow_type_2_id_container .chosen-single">
+                <option value=""></option>
+                {% for o in workflowTypeList %}
+                {% if o.parent_id %}
+                <option data-parent-id="{{o.parent_id}}" value="{{o.id}}">{{o.name}}</option>
+                {% endif %}
+                {% endfor %}
+              </select>
+              <div class="errors-container"></div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-sm-2 control-label pr0">任务名称<span class="text-danger">*</span></label>
+            <div class="col-sm-10">
+              <input name="name" value="{{item.name}}" type="text" class="form-control" required minlength="2" maxlength="32">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-sm-2 control-label pr0">执行人</label>
+            <div class="col-sm-10">
+              <select name="user_id" class="chosen-select input-md form-control" data-placeholder="请选择一个项目">
+                <option value=""></option>
+                {% for o in userList %}
+                <option value="{{o.id}}" {{'selected' if item.user_id==o.id}}>{{o.name}}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="panel-footer text-center">
+          <button type="submit" class="btn btn-info"><em class="fa fa-check fa-fw"></em>{{'保存' if item.id else '添加'}}</button>
+          <a href="javascript:history.go(-1)" class="btn btn-default"><em class="fa fa-close fa-fw"></em>取消</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="/static/vendor/chosen_v1.2.0/chosen.jquery.min.js"></script>
+<script src="/static/vendor/parsleyjs/dist/parsley.min.js"></script>
+<script src="/static/vendor/parsleyjs/dist/i18n/zh_cn.js"></script>
+<script src="/static/vendor/sweetalert/dist/sweetalert.min.js"></script>
+<script>
+$(function(){
+
+  $('.show-on-upload-archive,.show-on-apply-workflow').hide();
+  $('[name=finish_type]').change(function(){
+    var $this = $(this);
+    var finish_type = $this.val();
+
+    switch(finish_type){
+      case 'upload-archive': {
+        $('.show-on-apply-workflow').hide();
+        $('.show-on-upload-archive').show();
+      } break;
+      case 'apply-workflow': {
+        $('.show-on-upload-archive').hide();
+        $('.show-on-apply-workflow').show();
+
+      } break;
+    }
+  }).trigger('change');
+
+  var updateSelect = function($select){
+    var value = $select.data('value');
+    if(!value) return;
+    var level = $select.data('level');
+    var group = $select.data('group');
+    var pvalue = $('option[value='+value+']', $select).data('parent-id');
+    if(pvalue){
+      $('option[data-parent-id='+pvalue+']', $select).show();
+    }
+    $select.val(value);
+    $select.trigger("chosen:updated");
+    var $parent = $('select[data-group='+group+'][data-level='+(level-1)+']');
+    if($parent.size()){
+      $parent.data('value', pvalue);
+      updateSelect($parent);
+    }
+  }
+  $('select[data-group][data-level] option[data-parent-id]').hide();
+  $('select[data-group][data-level]').trigger("chosen:updated");
+  $('select[data-group][data-level][data-value]').each(function(){
+    updateSelect($(this));
+  });
+  $('select[data-group][data-level]').on('change', function(){
+    var $this = $(this);
+    var value = $this.val();
+    var level = $this.data('level');
+    var group = $this.data('group');
+
+    var $child = $('select[data-group='+group+'][data-level='+(level-0+1)+']');
+    $('option', $child).hide();
+    if(value){
+      $('option[data-parent-id='+value+']', $child).show();
+    }
+    $child.val('');
+    $child.trigger("chosen:updated");
+  });
+
+  $('.chosen-select').chosen({
+    no_results_text: '没有结果'
+  });
+
+  $('form').parsley().on('form:submit', function(){
+    var $form = this.$element;
+    var data = _.reduce($form.serializeArray(), function(result, o) {
+      if(~o.name.indexOf('.')){
+        _.set(result, o.name, o.value)
+      }else{
+        result[o.name] = o.value;
+      }
+      return result;
+    }, {});
+
+    data.params = JSON.stringify(data.params);
+
+    var url = $form.attr('action');
+    var type = $form.attr('method');
+    $.ajax({
+      url: url,
+      type: type,
+      data: data,
+      success: function(resp) {
+        if (resp.errno == 0) {
+          swal({title:'操作成功！',type:'success'},function () {
+            setTimeout(function(){
+              history.go(-1);
+            },100);
+          });
+        } else {
+          alert(resp.errmsg);
+        }
+      }
+    });
+    return false;
+  });
+});
+</script>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="/static/vendor/chosen_v1.2.0/chosen.min.css">
+<link rel="stylesheet" href="/static/vendor/sweetalert/dist/sweetalert.css">
+{% endblock %}

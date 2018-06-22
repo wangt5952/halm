@@ -1,0 +1,16 @@
+{
+  "apps": [{
+    "name": "C:Userslenovoe:WORKproject杂项学习项目nodejshalm",
+    "script": "www/production.js",
+    "cwd": "e:\WORK\project\杂项学习项目\nodejs\halm",
+    "exec_mode": "cluster",
+    "instances": 0,
+    "max_memory_restart": "1G",
+    "autorestart": true,
+    "node_args": [],
+    "args": [],
+    "env": {
+      
+    }
+  }]
+}

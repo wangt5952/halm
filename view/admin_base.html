@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>系统管理 - {{config.app.name}}</title>
+
+  <link rel="stylesheet" href="/static/vendor/fontawesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/static/vendor/simple-line-icons/css/simple-line-icons.css">
+  <link rel="stylesheet" href="/static/vendor/animate.css/animate.min.css">
+  <link rel="stylesheet" href="/static/vendor/whirl/dist/whirl.css">
+
+  {% block css %}
+  {% endblock %}
+  <link rel="stylesheet" href="/static/css/bootstrap.css">
+  <link rel="stylesheet" href="/static/css/app.css">
+</head>
+
+<body class="aside-collapsed-text">
+  <div class="wrapper">
+    <header class="topnavbar-wrapper">
+      <nav role="navigation" class="navbar topnavbar">
+        <div class="navbar-header visible-xs">
+          <div class="navbar-brand">
+            <div class="brand-logo text-white">
+              {{config.app.name}}
+            </div>
+          </div>
+        </div>
+
+        <div class="nav-wrapper text-center">
+          <ul class="nav navbar-nav">
+            <li>
+              <a href="#" data-toggle-state="aside-collapsed-text" class="hidden-xs">
+                <em class="fa fa-navicon"></em>
+              </a>
+              <a href="#" data-toggle-state="aside-toggled" data-no-persist="true" class="visible-xs sidebar-toggle">
+                <em class="fa fa-navicon"></em>
+              </a>
+            </li>
+
+          </ul>
+
+          <ul class="nav navbar-nav navbar-right">
+            <li>
+              <a href="/user" class="ph">
+                <em class="icon-user"></em> 我的首页
+              </a>
+            </li>
+          </ul>
+          <div class="text-white hidden-xs h3">
+            {{config.app.name}}
+          </div>
+        </div>
+      </nav>
+    </header>
+    <aside class="aside">
+      <div class="aside-inner">
+        <nav data-sidebar-anyclick-close="" class="sidebar">
+          <ul class="nav">
+            <li class="nav-heading ">
+              <span>系统管理</span>
+            </li>
+            {% if pageConfig.user.type_id == '999' or pageConfig.auth['admin'] %}
+            <li>
+              <a href="/admin" title="管理首页">
+                <em class="fa fa-home"></em>
+                <span>管理首页</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin/company" title="单位管理">
+                <em class="fa fa-sitemap"></em>
+                <span>单位管理</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin/user" title="人员管理">
+                <em class="fa fa-users"></em>
+                <span>人员管理</span>
+              </a>
+            </li>
+
+            <li>
+              <a href="/admin/project" title="项目管理">
+                <em class="fa fa-building"></em>
+                <span>项目管理</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin/area" title="区域管理">
+                <em class="fa fa-globe"></em>
+                <span>区域管理</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin/workflow" title="项目管理流程">
+                <em class="fa fa-trophy"></em>
+                <span>项目管理流程</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin/project_funds" title="Single View">
+                <em class="fa fa-rmb"></em>
+                <span data-localize="sidebar.nav.SINGLEVIEW">资金管理</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin/project_eval" title="Single View">
+                <em class="fa fa-crosshairs"></em>
+                <span data-localize="sidebar.nav.SINGLEVIEW">考评管理</span>
+              </a>
+            </li>
+            {% endif %}
+
+            {% if pageConfig.user.type_id == '999' or pageConfig.auth['admin:article'] %}
+            <li>
+              <a href="/admin/article" title="Single View">
+                <em class="fa fa-newspaper-o"></em>
+                <span data-localize="sidebar.nav.SINGLEVIEW">文章栏目</span>
+              </a>
+            </li>
+            {% endif %}
+
+            {% if pageConfig.user.type_id == '999' or pageConfig.auth['admin'] %}
+            <li>
+              <a href="/admin/form_tmpl" title="Single View">
+                <em class="fa fa-book"></em>
+                <span data-localize="sidebar.nav.SINGLEVIEW">表式模版</span>
+              </a>
+            </li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+    </aside>
+    <aside class="offsidebar hide">
+      <nav>
+        <div role="tabpanel">
+          <ul role="tablist" class="nav nav-tabs nav-justified">
+            <li role="presentation" class="active">
+              <a href="#app-settings" aria-controls="app-settings" role="tab" data-toggle="tab">
+                <em class="icon-equalizer fa-lg"></em>
+              </a>
+            </li>
+            <li role="presentation">
+              <a href="#app-chat" aria-controls="app-chat" role="tab" data-toggle="tab">
+                <em class="icon-user fa-lg"></em>
+              </a>
+            </li>
+          </ul>
+          <div class="tab-content">
+            <div id="app-settings" role="tabpanel" class="tab-pane fade in active">
+              <h3 class="text-center text-thin">Tab 1</h3>
+            </div>
+            <div id="app-chat" role="tabpanel" class="tab-pane fade">
+              <h3 class="text-center text-thin">Tab 2</h3>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </aside>
+    <section>
+      <div class="content-wrapper">
+        <h3>
+          {% for o in pageConfig.breadcrumbList %}
+          {% if loop.last %}
+          {{o.name}}
+          {% endif %}
+          {% endfor %}
+           <ol class="breadcrumb">
+             {% for o in pageConfig.breadcrumbList %}
+             <li class="{{'active' if loop.last }}">
+               {% if not loop.last and o.href %}
+               <a href="{{o.href}}">{{o.name}}</a>
+               {% else %}
+               {{o.name}}
+               {% endif %}
+             </li>
+             {% endfor %}
+           </ol>
+        </h3>
+
+        {% block content %}
+        {% endblock %}
+      </div>
+    </section>
+
+
+  </div>
+
+  {% block body %}
+  {% endblock %}
+
+
+  <script src="/static/vendor/modernizr/modernizr.custom.js"></script>
+  <script src="/static/vendor/jquery/dist/jquery.js"></script>
+  <script src="/static/vendor/bootstrap/dist/js/bootstrap.js"></script>
+  <script src="/static/vendor/jQuery-Storage-API/jquery.storageapi.js"></script>
+  <script src="/static/vendor/jquery.easing/js/jquery.easing.js"></script>
+  <script src="/static/vendor/animo.js/animo.js"></script>
+  <script src="/static/js/app.js"></script>
+  <script src="/static/vendor/lodash/lodash.min.js"></script>
+
+  {% block script %}
+  {% endblock %}
+</body>
+
+</html>

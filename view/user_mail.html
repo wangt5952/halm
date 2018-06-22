@@ -1,0 +1,86 @@
+{% extends "./user_base.html" %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-12">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <a class="btn btn-info" href="/user/mail_edit">
+          <em class="fa fa-plus fa-fw"></em><span>发送公文</span>
+        </a>
+
+        <a href="/user/mail?kind=1" class="btn {{'btn-default' if 1 == (http.query.kind or 1) else 'btn-info'}}">
+          <em class="fa fa-question fa-fw"></em><span>待办公文</span>
+        </a>
+        <a href="/user/mail?kind=2" class="btn {{'btn-default' if 2 == http.query.kind else 'btn-info'}}">
+          <em class="fa fa-exclamation fa-fw"></em><span>已办公文</span>
+        </a>
+        <a href="/user/mail?kind=3" class="btn {{'btn-default' if 3 == http.query.kind else 'btn-info'}}">
+          <em class="fa fa-send fa-fw"></em><span>已发公文</span>
+        </a>
+      </div>
+      <div class="panel-body">
+         <table id="datatable1" class="table table-striped table-hover">
+            <thead>
+               <tr>
+                 {% if http.query.kind == 3%}
+                 <th>收件人</th>
+                 {% endif %}
+                 {% if http.query.kind != 3%}
+                 <th>发件人</th>
+                 {% endif %}
+                 <th>标题</th>
+                 <th>发送时间</th>
+                 <th>操作</th>
+               </tr>
+            </thead>
+         </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="/static/vendor/datatables/media/js/jquery.dataTables.min.js"></script>
+<script src="/static/vendor/datatables-colvis/js/dataTables.colVis.js"></script>
+<script src="/static/vendor/datatables/media/js/dataTables.bootstrap.js"></script>
+<script>
+$(function(){
+  $('#datatable1').dataTable({
+    'ajax':'/user/mail?kind={{http.query.kind or 1}}',
+    'columns':[
+      {% if http.query.kind == 3%}
+      {'data':'to_user_name', orderable:false},
+      {% endif %}
+      {% if http.query.kind != 3%}
+      {'data':'user_name', orderable:false},
+      {% endif %}
+      {'data':'name', orderable:false},
+      {'data':'create_time', orderable:false},
+      {'data':'id', orderable:false, render:function(data,display,row){
+        {% if http.query.kind == 3 %}
+        let href = '/user/mail_view?id='+data;
+        let processText = '查看';
+        return ' <a href="'+href+'" class="btn btn-info btn-xs"><em class="fa fa-eye fa-fw"></em>'+processText+'</a>';
+        {% else %}
+        return ' <a href="/user/mail_view?mu_id='+row.mu_id+'" class="btn btn-info btn-xs"><em class="fa fa-eye fa-fw"></em>查看</a>';
+        {% endif %}
+      }}
+    ],
+    'columnDefs':[
+      {targets:'_all',defaultContent:'-'}
+    ],
+    'serverSide':true,
+    'stateSave':true,
+    'language':{'url':'/static/vendor/datatables/i18n/Chinese.json'}
+  });
+})
+</script>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="/static/vendor/datatables-colvis/css/dataTables.colVis.css">
+<link rel="stylesheet" href="/static/vendor/datatables/media/css/dataTables.bootstrap.css">
+<link rel="stylesheet" href="/static/vendor/dataTables.fontAwesome/index.css">
+{% endblock %}

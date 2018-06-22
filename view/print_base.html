@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>{{pageConfig.user.name}} - {{config.app.name}}</title>
+
+  <link rel="stylesheet" href="/static/vendor/fontawesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/static/vendor/simple-line-icons/css/simple-line-icons.css">
+  <link rel="stylesheet" href="/static/vendor/animate.css/animate.min.css">
+  <link rel="stylesheet" href="/static/vendor/whirl/dist/whirl.css">
+
+  {% block css %}
+  {% endblock %}
+  <link rel="stylesheet" href="/static/css/bootstrap.css">
+  <link rel="stylesheet" href="/static/css/app.css">
+</head>
+
+<body class="aside-collapsed-text">
+  <div class="wrapper">
+    <div class="content-wrapper">
+      {% block content %}
+      {% endblock %}
+    </div>
+  </div>
+
+  <script src="/static/vendor/modernizr/modernizr.custom.js"></script>
+  <script src="/static/vendor/jquery/dist/jquery.js"></script>
+  <script src="/static/vendor/bootstrap/dist/js/bootstrap.js"></script>
+  <script src="/static/vendor/jQuery-Storage-API/jquery.storageapi.js"></script>
+  <script src="/static/vendor/jquery.easing/js/jquery.easing.js"></script>
+  <script src="/static/vendor/animo.js/animo.js"></script>
+  <script src="/static/js/app.js"></script>
+  <script src="/static/vendor/lodash/lodash.min.js"></script>
+
+  {% block script %}
+  {% endblock %}
+</body>
+
+</html>

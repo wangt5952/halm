@@ -1,0 +1,337 @@
+{% extends "./admin_base.html" %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-12">
+    <form action="/admin/user_edit" method="post" class="form-horizontal">
+      <input type="hidden" name="id" value="{{item.id}}">
+      <input type="hidden" name="oper" value="{{'edit' if item.id else 'add'}}">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="panel-title">人员信息</div>
+        </div>
+        <div class="panel-body bt">
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label class="col-sm-4 control-label pr0">姓名<span class="text-danger">*</span></label>
+                <div class="col-sm-8">
+                  <input name="name" value="{{item.name}}" type="text" class="form-control" required minlength="2" maxlength="16">
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label class="col-sm-4 col-lg-2 col-md-3 control-label pr0">性别<span class="text-danger">*</span></label>
+
+                <div class="col-sm-8 col-lg-10 col-md-9" style="height: 35px;">
+                  <label class="radio-inline c-radio">
+                    <input name="sex" type="radio"  value="男" {{'checked' if (item.sex or '男')=='男'}}>
+                    <span class="fa fa-male"></span>男
+                  </label>
+                  <label class="radio-inline c-radio">
+                    <input name="sex" type="radio" value="女" {{'checked' if item.sex=='女'}}>
+                    <span class="fa fa-female"></span>女
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label class="col-sm-4 control-label pr0">身份证号<span class="text-danger">*</span></label>
+                <div class="col-sm-8">
+                  <input name="idno" value="{{item.idno}}" type="text" class="form-control" maxlength="18" required pattern="^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$">
+                </div>
+              </div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label class="col-sm-4 col-lg-2 col-md-3 control-label pr0">工作单位</label>
+                <div class="col-sm-8 col-lg-10 col-md-9">
+                  {% if pageConfig.company %}
+                  <input value="{{pageConfig.company.name}}" type="text" class="form-control" readonly>
+                  <input value="{{pageConfig.company.id}}" name="company_id" type="hidden">
+                  {% else %}
+                  <select name="company_id" class="chosen-select input-md form-control" data-placeholder="请选择一个单位">
+                    <option value=""></option>
+                    {% for o in companyList %}
+                    <option value="{{o.id}}" {{'selected' if item.company_id==o.id}}>{{o.name}}</option>
+                    {% endfor %}
+                  </select>
+                  {% endif %}
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label class="col-sm-4 control-label pr0">主管区域<span class="text-danger">*</span>
+                  <a class="text-info" href="javascript:;" data-toggle="tooltip" title="在项目中的职务">?</a>
+                </label>
+                <div class="col-sm-8">
+                  <select name="area_id" class="chosen-select-deselect input-md form-control" data-placeholder="请选择一个主管区域">
+                    <option value=""></option>
+                    {% for o in areaList %}
+                    <option value="{{o.id}}" {{'selected' if item.area_id==o.id}}>{{o.name}}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label class="col-sm-4 col-lg-2 col-md-3 control-label pr0">主管项目类型<span class="text-danger">*</span></label>
+                <div class="col-sm-8 col-lg-10 col-md-9">
+                  <select name="project_type_id" class="chosen-select-deselect input-md form-control" data-placeholder="请选择一个主管项目类型">
+                    <option value=""></option>
+                    {% for o in projectTypeList %}
+                    <option value="{{o.id}}" {{'selected' if item.project_type_id==o.id}}>{{o.name}}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label class="col-sm-4 control-label pr0">职务<span class="text-danger">*</span>
+                  <a class="text-info" href="javascript:;" data-toggle="tooltip" title="在项目中的职务">?</a>
+                </label>
+                <div class="col-sm-8">
+                  <input name="job" value="{{item.job}}" type="text" class="form-control" required maxlength="32">
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label class="col-sm-4 col-lg-2 col-md-3 control-label pr0">职称<span class="text-danger">*</span></label>
+                <div class="col-sm-8 col-lg-10 col-md-9">
+                  <input name="title" value="{{item.title}}" type="text" class="form-control" required maxlength="32">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label class="col-sm-4 control-label pr0">联系号码</label>
+                <div class="col-sm-8">
+                  <input name="mobile" value="{{item.mobile}}" type="text" class="form-control">
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label class="col-sm-4 col-lg-2 col-md-3 control-label pr0">用户名<span class="text-danger">*</span></label>
+                <div class="col-sm-8 col-lg-10 col-md-9">
+                  <input name="username" value="{{item.username}}" type="text" class="form-control" required minlength="2" maxlength="16" data-parsley-type="alphanum">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label class="col-sm-4 control-label pr0">类型<span class="text-danger">*</span></label>
+                <div class="col-sm-8" id="type_id_container">
+                  <select name="type_id" class="chosen-select input-md form-control" data-placeholder="请选择一个类别" required data-parsley-errors-container="#type_id_container .errors-container" data-parsley-class-handler="#type_id_container .chosen-single">
+                    <option value=""></option>
+                    {% for o in typeList %}
+                    <option value="{{o.id}}" {{'selected' if item.type_id==o.id}}>{{o.name}}</option>
+                    {% endfor %}
+                  </select>
+                  <div class="errors-container"></div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label class="col-sm-4 col-lg-2 col-md-3 control-label pr0">密码</label>
+                <div class="col-sm-8 col-lg-10 col-md-9">
+                  <input name="password" value="{{item.password}}" type="text" class="form-control">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label class="col-sm-4 control-label pr0">邮箱</label>
+                <div class="col-sm-8">
+                  <input name="email" value="{{item.email}}" type="email" class="form-control">
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label class="col-sm-4 col-lg-2 col-md-3 control-label pr0">HID</label>
+                <div class="col-sm-8 col-lg-10 col-md-9">
+                  <input name="hid" value="{{item.hid}}" type="text" class="form-control">
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+
+          <div class="form-group">
+            <label class="col-sm-2 control-label pr0">头像</label>
+            <div class="col-sm-10">
+              {% for o in item.head_attach_id %}
+              <a href="/index/image?id={{o}}" class="inline" data-gallery="head_attach_id">
+                <img src="/index/image?id={{o}}" class="img-thumbnail thumb80">
+                <input type="hidden" name="head_attach_id" value="{{o}}">
+              </a>
+              {% endfor %}
+              <span class="btn btn-info inline fileinput-button thumb80" data-url="/user/upload" data-name="head_attach_id">
+                <em class="fa fa-plus fa-2x"></em>
+                <input type="file" name="files[]" multiple>
+              </span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-sm-2 control-label pr0">从业证书</label>
+            <div class="col-sm-10">
+              {% for o in item.cyzs_attach_id %}
+              <a href="/index/image?id={{o}}" class="inline" data-gallery="cyzs_attach_id">
+                <img src="/index/image?id={{o}}" class="img-thumbnail thumb80">
+                <input type="hidden" name="cyzs_attach_id" value="{{o}}">
+              </a>
+              {% endfor %}
+              <span class="btn btn-info inline fileinput-button thumb80" data-url="/user/upload" data-name="cyzs_attach_id">
+                <em class="fa fa-plus fa-2x"></em>
+                <input type="file" name="files[]" multiple>
+              </span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label pr0">权限</label>
+            <div class="col-sm-10">
+              {% for o in authTree %}
+              <div>
+                <label class="checkbox-inline c-checkbox">
+                  <input type="checkbox" name="auth" value="{{o.code}}" {{o.checked and 'checked'}}>
+                  <span class="fa fa-check"></span>{{o.name}}
+                </label>
+                {% if o.children.length %}
+                <label class="checkbox-inline">子权限：</label>
+                {% for p in o.children %}
+                <label class="checkbox-inline c-checkbox">
+                  <input type="checkbox" name="auth" value="{{p.code}}" {{p.checked and 'checked'}}>
+                  <span class="fa fa-check"></span>{{p.name}}
+                </label>
+                {% endfor %}
+                {% endif %}
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+        </div>
+        <div class="panel-footer text-center">
+          <button type="submit" class="btn btn-info"><em class="fa fa-check fa-fw"></em>{{'保存' if item.id else '添加'}}</button>
+          <a href="javascript:history.go(-1)" class="btn btn-default"><em class="fa fa-close fa-fw"></em>取消</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block body %}
+<div id="blueimp-gallery" class="blueimp-gallery">
+    <div class="slides"></div>
+    <h3 class="title"></h3>
+    <a class="prev">‹</a>
+    <a class="next">›</a>
+    <a class="close">×</a>
+    <a class="play-pause"></a>
+    <ol class="indicator"></ol>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="/static/vendor/chosen_v1.2.0/chosen.jquery.min.js"></script>
+<script src="/static/vendor/parsleyjs/dist/parsley.min.js"></script>
+<script src="/static/vendor/parsleyjs/dist/i18n/zh_cn.js"></script>
+<script src="/static/vendor/sweetalert/dist/sweetalert.min.js"></script>
+<script src="/static/vendor/jquery-ui/ui/widget.js"></script>
+<script src="/static/vendor/blueimp-file-upload/js/jquery.fileupload.js"></script>
+<script src="/static/vendor/blueimp-gallery/js/jquery.blueimp-gallery.min.js"></script>
+<script>
+$(function(){
+  $('.chosen-select').chosen({
+    no_results_text: '没有结果'
+  });
+  $('.chosen-select-deselect').chosen({
+    no_results_text: '没有结果',
+    allow_single_deselect:true
+  });
+
+  $('.fileinput-button').fileupload({
+    done: function(e, data){
+      var $this = $(this);
+      var result = data.result;
+      var name = $this.data('name');
+
+      _.forEach(result.data, function(o){
+        $this.before(''
+          + '<a href="/index/image?id='+o.id+'" class="inline" data-gallery="'+name+'">'
+          + '<img src="/index/image?id='+o.id+'" class="img-thumbnail thumb80">'
+          + '<input type="hidden" name="'+name+'" value="'+o.id+'">'
+          + '</a>'
+        );
+      });
+    }
+  });
+
+  $('form').parsley().on('form:submit', function(){
+    var $form = this.$element;
+    var data = _.reduce($form.serializeArray(), function(result, o) {
+      if(!result[o.name]) result[o.name] = o.value;
+      else result[o.name] = result[o.name] + ',' + o.value;
+      return result;
+    }, {});
+
+    var url = $form.attr('action');
+    var type = $form.attr('method');
+    $.ajax({
+      url: url,
+      type: type,
+      data: data,
+      success: function(resp) {
+        if (resp.errno == 0) {
+          swal({title:'操作成功！',type:'success'},function () {
+            setTimeout(function(){
+              history.go(-1);
+            },100);
+          });
+        } else {
+          swal({title:resp.errmsg,type:'error'});
+        }
+      }
+    });
+    return false;
+  });
+});
+</script>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="/static/vendor/chosen_v1.2.0/chosen.min.css">
+<link rel="stylesheet" href="/static/vendor/sweetalert/dist/sweetalert.css">
+<link rel="stylesheet" href="/static/vendor/blueimp-file-upload/css/jquery.fileupload.css">
+<link rel="stylesheet" href="/static/vendor/blueimp-gallery/css/blueimp-gallery.min.css">
+{% endblock %}

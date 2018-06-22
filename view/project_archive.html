@@ -1,0 +1,209 @@
+{% extends "./project_base.html" %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-12">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        {% if not http.query.project_id %}
+        <a class="btn btn-info"
+        {% if http.query.id %}
+        href="/project/archive_folder?parent_id={{http.query.id}}"
+        {% else %}
+        href="/project/archive_folder?project_id={{pageConfig.project.id}}"
+        {% endif %}
+        >
+          <em class="fa fa-plus fa-fw"></em><span>新建目录</span>
+        </a>
+        {% endif %}
+
+        {% if http.query.id %}
+        <span class="btn btn-info fileinput-button" data-url="/project/archive_upload?id={{http.query.id}}">
+          <em class="fa fa-upload fa-fw"></em><span>上传文档 <span id="pn"></span></span>
+          <input type="file" name="files[]" multiple>
+        </span>
+        {% endif %}
+
+        <button type="button" class="btn btn-info btn-download" disabled>
+          <em class="fa fa-download fa-fw"></em><span>下载选择</span>
+        </button>
+      </div>
+      <div class="panel-body table-responsive">
+        <table id="datatable1" class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>
+                <div class="all-checkbox checkbox c-checkbox">
+                   <label><input type="checkbox"><span class="fa fa-check"></span></label>
+                </div>
+              </th>
+              <th>名称</th>
+              <th>类型</th>
+              <th>创建时间</th>
+              <th>创建者</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block body %}
+<div id="blueimp-gallery" class="blueimp-gallery">
+    <div class="slides"></div>
+    <h3 class="title"></h3>
+    <a class="prev">‹</a>
+    <a class="next">›</a>
+    <a class="close">×</a>
+    <a class="play-pause"></a>
+    <ol class="indicator"></ol>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="/static/vendor/datatables/media/js/jquery.dataTables.min.js"></script>
+<script src="/static/vendor/datatables-colvis/js/dataTables.colVis.js"></script>
+<script src="/static/vendor/datatables/media/js/dataTables.bootstrap.js"></script>
+<script src="/static/vendor/jquery-ui/ui/widget.js"></script>
+<script src="/static/vendor/blueimp-file-upload/js/jquery.fileupload.js"></script>
+<script src="/static/vendor/blueimp-gallery/js/jquery.blueimp-gallery.min.js"></script>
+<script src="/static/vendor/sweetalert/dist/sweetalert.min.js"></script>
+<script>
+function del(id){
+  swal({
+    title: '确认删除编号是'+id+'的记录?',
+    type: "warning",
+    showCancelButton: true,
+    cancelButtonText: '取消',
+    confirmButtonColor: "#DD6B55",
+    confirmButtonText: "是的，删除它",
+    closeOnConfirm: false
+  },
+  function(){
+    $.ajax({
+      url: '/project/archive_edit',
+      type: 'POST',
+      data: {oper:'del',id:id},
+      success: function(resp) {
+        if (resp.errno == 0) {
+          swal({title:'操作成功！',type:'success'},function () {
+            setTimeout(function(){
+              window.location.reload();
+            },100);
+          });
+        } else {
+          alert(resp.errmsg);
+        }
+      }
+    });
+  });
+}
+
+$(function(){
+
+  $('.btn-download').on('click', function(){
+    var ids = _.map($('.list-checkbox input:checked'), function(o){
+      return o.value;
+    }).join(',')
+
+    window.location.href = '/project/archive_download?id='+ids;
+  })
+
+  $('.all-checkbox input:checkbox').on('change', function(){
+    $('.list-checkbox input:checkbox').prop('checked',this.checked);
+    $('.btn-download').prop('disabled', !this.checked);
+  })
+
+  $('#datatable1').on('change', '.list-checkbox input:checkbox', function(){
+    var checked_count = $('.list-checkbox input:checkbox:checked').size();
+    var all_count = $('.list-checkbox input:checkbox').size();
+    $('.all-checkbox input:checkbox').prop('checked', checked_count == all_count);
+    $('.btn-download').prop('disabled', !checked_count);
+  })
+
+  var i = 0;
+  $('.fileinput-button').fileupload({
+    send:function(){
+      i++;
+    },
+    done:function(e, data){
+      i--;
+      if(!i){
+        window.location.reload();
+      }
+
+    }
+  }).on('fileuploadprogressall', function(e, data){
+    var val = data.loaded / data.total;
+    $('#pn').html((val * 100).toFixed(2)+'%')
+  })
+
+  $('#datatable1').dataTable({
+    {% if http.query.id %}
+    'ajax':'/project/archive?id={{http.query.id}}',
+    {% else %}
+    'ajax':'/project/archive?project_id={{pageConfig.project.id}}',
+    {% endif %}
+    'columns':[
+      {'data':'id', render:function(data, display, row){
+        return '<div class="list-checkbox checkbox c-checkbox"><label><input type="checkbox" value="'+data+'"><span class="fa fa-check"></span></label></div>'
+      },width:'20px'},
+      {'data':'name', render:function(data, display, row){
+
+        var html = ''
+          + (!row.hash ? '<a href="/project/archive?id='+row.id+'">' : '')
+          + ((row.color && row.icon) ? ''
+            + '<span class="fa-stack">'
+            + '<em class="fa fa-circle fa-stack-2x '+row.color+'"></em>'
+            + '<em class="fa '+row.icon+' fa-stack-1x fa-inverse text-white"></em>'
+            + '</span>'
+           : '' )
+          + data
+          + (!row.hash ? '</a> ' : '')
+          + (row.imageList && row.imageList.length ? (
+            '<br>'
+            + _.map(row.imageList, function(o){
+              return '<a href="'+o+'" class="inline" data-gallery>'
+                  + '<img src="'+o+'" class="img-thumbnail thumb32">'
+                  + '</a>';
+            }).join('')) : '')
+          + (row.info ? '<br><span class="text-sm hidden-xs">'+row.info+'</span>':'');
+
+          return html;
+      }},
+      {'data':'type'},
+      {'data':'create_time'},
+      {'data':'user_name'},
+      {'data':'id', render:function(data, display, row){
+        return ''
+          + ((row.hash || !row.parent_id) ? '' : ' <a href="/project/archive_folder?id='+data+'" class="btn btn-info btn-xs"><em class="fa fa-edit fa-fw"></em>编辑</a>')
+          + (row.hash ? ' <a href="/project/archive_download?id='+data+'" target="_blank" class="btn btn-info btn-xs"><em class="fa fa-search fa-fw"></em>查看</a>':'')
+          + (row.canDelete && row.parent_id ? ' <a href="javascript:del('+data+')" target="_blank" class="btn btn-danger btn-xs"><em class="fa fa-close fa-fw"></em>删除</a>':'');
+      }}
+    ],
+    'columnDefs':[
+      {targets:'_all',defaultContent:'-'}
+    ],
+    order:[[2,'desc']],
+    'serverSide':true,
+    'stateSave':true,
+    'language':{'url':'/static/vendor/datatables/i18n/Chinese.json'},
+    'ordering':false
+  }).on('draw.dt', function(){
+    $('.all-checkbox input:checkbox').prop('checked', false);
+  });
+})
+</script>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="/static/vendor/datatables-colvis/css/dataTables.colVis.css">
+<link rel="stylesheet" href="/static/vendor/datatables/media/css/dataTables.bootstrap.css">
+<link rel="stylesheet" href="/static/vendor/dataTables.fontAwesome/index.css">
+<link rel="stylesheet" href="/static/vendor/blueimp-file-upload/css/jquery.fileupload.css">
+<link rel="stylesheet" href="/static/vendor/blueimp-gallery/css/blueimp-gallery.min.css">
+<link rel="stylesheet" href="/static/vendor/sweetalert/dist/sweetalert.css">
+{% endblock %}

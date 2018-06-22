@@ -1,0 +1,84 @@
+{% extends "./admin_base.html" %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <div class="panel-title">项目配置</div>
+      </div>
+      <div class="panel-body bt">
+        <div role="tabpanel">
+          <ul role="tablist" class="nav nav-tabs">
+            <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">基础</a></li>
+            <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Profile</a></li>
+            <li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">Messages</a></li>
+            <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Settings</a></li>
+          </ul>
+          <div class="tab-content">
+            <div id="home" role="tabpanel" class="tab-pane active">Suspendisse velit erat, vulputate sit amet feugiat a, lobortis nec felis.</div>
+            <div id="profile" role="tabpanel" class="tab-pane">Integer lobortis commodo auctor.</div>
+            <div id="messages" role="tabpanel" class="tab-pane">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</div>
+            <div id="settings" role="tabpanel" class="tab-pane">Sed commodo tellus ut mi tristique pharetra.</div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-footer text-center">
+        <button type="submit" class="btn btn-info"><em class="fa fa-check fa-fw"></em>保存</button>
+        <a href="javascript:history.go(-1)" class="btn btn-default"><em class="fa fa-close fa-fw"></em>取消</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="/static/vendor/chosen_v1.2.0/chosen.jquery.min.js"></script>
+<script src="/static/vendor/parsleyjs/dist/parsley.min.js"></script>
+<script src="/static/vendor/parsleyjs/dist/i18n/zh_cn.js"></script>
+<script src="/static/vendor/sweetalert/dist/sweetalert.min.js"></script>
+<script src="/static/vendor/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+<script src="/static/vendor/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+<script>
+$(function(){
+  $('.datetimepicker').datetimepicker({language:'zh-CN',autoclose:true,fontAwesome:true});
+  $('.chosen-select').chosen({
+    no_results_text: '没有结果'
+  });
+
+  $('form').parsley().on('form:submit', function(){
+    var $form = this.$element;
+    var data = _.reduce($form.serializeArray(), function(result, o) {
+      result[o.name] = o.value;
+      return result;
+    }, {});
+
+    var url = $form.attr('action');
+    var type = $form.attr('method');
+    $.ajax({
+      url: url,
+      type: type,
+      data: data,
+      success: function(resp) {
+        if (resp.errno == 0) {
+          swal({title:'操作成功！',type:'success'},function () {
+            setTimeout(function(){
+              history.go(-1);
+            },100);
+          });
+        } else {
+          alert(resp.errmsg);
+        }
+      }
+    });
+    return false;
+  });
+});
+</script>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="/static/vendor/chosen_v1.2.0/chosen.min.css">
+<link rel="stylesheet" href="/static/vendor/sweetalert/dist/sweetalert.css">
+<link rel="stylesheet" href="/static/vendor/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+{% endblock %}

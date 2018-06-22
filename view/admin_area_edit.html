@@ -1,0 +1,114 @@
+{% extends "./admin_base.html" %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-12">
+    <form action="/admin/area_edit" method="post" class="form-horizontal">
+      <input type="hidden" name="id" value="{{item.id}}">
+      <input type="hidden" name="oper" value="{{'edit' if item.id else 'add'}}">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="panel-title">区域信息</div>
+        </div>
+        <div class="panel-body bt">
+          <div class="form-group">
+            <label class="col-sm-2 control-label pr0">名称</label>
+            <div class="col-sm-10">
+              <input name="name" value="{{item.name}}" type="text" class="form-control">
+            </div>
+          </div>
+
+
+          <div class="form-group">
+            <label class="col-sm-2 control-label pr0">行政级别</label>
+            <div class="col-sm-10" style="height: 35px;">
+              {% for o in [['市级',2],['区县级',3]] %}
+              <label class="radio-inline c-radio">
+                <input name="level" type="radio"  value="{{o[1]}}" {{'checked' if (item.level or 3)==o[1]}}>
+                <span class="fa fa-check"></span> {{o[0]}}
+              </label>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="form-group show-on-parent">
+            <label class="col-sm-2 control-label pr0">上级</label>
+            <div class="col-sm-10">
+              <select name="parent_id" class="chosen-select input-md form-control" data-placeholder="请选择一个单位">
+                <option value=""></option>
+                {% for o in areaList %}
+                <option value="{{o.id}}" {{'selected' if item.parent_id==o.id}}>{{o.name}}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="panel-footer text-center">
+          <button type="submit" class="btn btn-info"><em class="fa fa-check fa-fw"></em>{{'保存' if item.id else '添加'}}</button>
+          <a href="javascript:history.go(-1)" class="btn btn-default"><em class="fa fa-close fa-fw"></em>取消</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="/static/vendor/chosen_v1.2.0/chosen.jquery.min.js"></script>
+<script src="/static/vendor/parsleyjs/dist/parsley.min.js"></script>
+<script src="/static/vendor/parsleyjs/dist/i18n/zh_cn.js"></script>
+<script src="/static/vendor/sweetalert/dist/sweetalert.min.js"></script>
+
+<script>
+$(function(){
+  $('.chosen-select').chosen({
+    no_results_text: '没有结果'
+  });
+
+  {% if (item.level or 3) < 3 %}
+  $('.show-on-parent').hide();
+  {% endif %}
+
+  $('[name=level]').on('change',function(){
+    if(this.value == 3){
+      $('.show-on-parent').show();
+    }else{
+      $('.show-on-parent').hide();
+    }
+  });
+
+  $('form').parsley().on('form:submit', function(){
+    var $form = this.$element;
+    var data = _.reduce($form.serializeArray(), function(result, o) {
+      result[o.name] = o.value;
+      return result;
+    }, {});
+
+    var url = $form.attr('action');
+    var type = $form.attr('method');
+    $.ajax({
+      url: url,
+      type: type,
+      data: data,
+      success: function(resp) {
+        if (resp.errno == 0) {
+          swal({title:'操作成功！',type:'success'},function () {
+            setTimeout(function(){
+              history.go(-1);
+            },100);
+          });
+        } else {
+          alert(resp.errmsg);
+        }
+      }
+    });
+    return false;
+  });
+});
+</script>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="/static/vendor/chosen_v1.2.0/chosen.min.css">
+<link rel="stylesheet" href="/static/vendor/sweetalert/dist/sweetalert.css">
+{% endblock %}

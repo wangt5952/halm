@@ -1,0 +1,101 @@
+{% extends "./print_base.html" %}
+
+{% block content %}
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <button type="button" class="btn btn-info btn-print"><em class="fa fa-print fa-fw"></em>打印</button>
+    <button type="button" class="btn btn-info btn-close"><em class="fa fa-print fa-fw"></em>关闭</button>
+  </div>
+  <div class="panel-body bt" id="table" style="background-color: white;">
+    <div class="text-center">
+      <h2>
+        {{year.name}}{{area.name}}工程建设进度统计表
+        {% if type %}
+        （{{type.name}}）
+        {% endif %}
+      </h2>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-bordered">
+        <thead class="bt">
+          <tr>
+            <th style="min-width:200px;" class="text-center">项目名称</th>
+            <th width="75px" class="text-center">总投资(万元)</th>
+            <th style="min-width:85px" class="text-center">分布乡镇</th>
+            <th width="85px" class="text-center">开工时间</th>
+            <th width="85px" class="text-center">计划完成时间</th>
+            <th width="80px" class="text-center">完成投资(万元)</th>
+            <th width="80px" class="text-center">形象进度(%)</th>
+            <th width="80px" class="text-center">计量金额(万元)</th>
+            <th width="80px" class="text-center">计量进度(%)</th>
+            <th width="80px" class="text-center">支付金额(万元)</th>
+            <th width="80px" class="text-center">支付进度(%)</th>
+            <th width="85px" class="text-center">完工验收时间</th>
+            <th width="85px" class="text-center">竣工验收时间</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% set tzgm, wctz, jlje, zfje, xmgs,xxjd,jljd,zfjd = 0 %}
+          {% for i in  projectList %}
+          {% set tzgm = tzgm + (i.tzgm or 0) %}
+          {% set wctz = wctz + (i.wctz or 0) %}
+          {% set jlje = jlje + (i.jlje or 0) %}
+          {% set zfje = zfje + (i.zfje or 0) %}
+          {% set xxjd = xxjd + (i.xxjd or 0) %}
+          {% set jljd = jljd + (i.jljd or 0) %}
+          {% set zfjd = zfjd + (i.zfjd or 0) %}
+          {% set xmgs = xmgs + 1 %}
+          {% endfor %}
+          <tr>
+            <td class="text-center">合计</td>
+            <td class="text-center">{{tzgm}}</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="text-center">{{wctz}}</td>
+            <td class="text-center">{{(xxjd/xmgs)|round if xmgs else '-'}}</td>
+            <td class="text-center">{{jlje}}</td>
+            <td class="text-center">{{(jljd/xmgs)|round if xmgs else '-'}}</td>
+            <td class="text-center">{{zfje}}</td>
+            <td class="text-center">{{(zfjd/xmgs)|round if xmgs else '-'}}</td>
+            <td></td>
+            <td></td>
+          </tr>
+          {% for o in projectList %}
+          <tr>
+            <td class="text-center">{{o.name}}</td>
+            <td class="text-center">{{o.tzgm}}</td>
+            <td>{{o.address}}</td>
+            <td class="text-center">{{o.kg_time}}</td>
+            <td class="text-center">{{o.jhwc_time}}</td>
+            <td class="text-center">{{o.wctz}}</td>
+            <td class="text-center">{{o.xxjd}}</td>
+            <td class="text-center">{{o.jlje}}</td>
+            <td class="text-center">{{o.jljd}}</td>
+            <td class="text-center">{{o.zfje}}</td>
+            <td class="text-center">{{o.zfjd}}</td>
+            <td class="text-center">{{o.wgys_time}}</td>
+            <td class="text-center">{{o.jgys_time}}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+$(function(){
+  $('.btn-print').click(function(){
+    window.print();
+  })
+
+  $('.btn-close').click(function(){
+    window.close();
+  })
+})
+</script>
+{% endblock %}

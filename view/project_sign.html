@@ -1,0 +1,94 @@
+{% extends "./project_base.html" %}
+
+{% block content %}
+<div class="panel panel-default">
+  <div class="panel-heading">
+
+    <div class="btn-group">
+      <button data-toggle="dropdown" class="btn btn-default">
+        施工单位 <b class="caret"></b>
+      </button>
+      <ul role="menu" class="dropdown-menu">
+        {% for o in shigongList %}
+        <li><a href="/project/sign?project_id={{pageConfig.project.id}}&company_id={{o.value}}">{{o.name}}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="btn-group">
+      <button data-toggle="dropdown" class="btn btn-default">
+        监理单位 <b class="caret"></b>
+      </button>
+      <ul role="menu" class="dropdown-menu">
+        {% for o in jianliList %}
+        <li><a href="/project/sign?project_id={{pageConfig.project.id}}&company_id={{o.value}}">{{o.name}}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="btn-group">
+      <button data-toggle="dropdown" class="btn btn-default">
+        建设单位 <b class="caret"></b>
+      </button>
+      <ul role="menu" class="dropdown-menu">
+        {% for o in jiansheList %}
+        <li><a href="/project/sign?project_id={{pageConfig.project.id}}&company_id={{o.value}}">{{o.name}}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    {{company.name}}
+
+    <div class="pull-right">
+      <a href="#" class="btn btn-info btn-print"><em class="fa fa-print fa-fw"></em>打印</a>
+      <a class="btn btn-info btn-export"><em class="fa fa-download fa-fw"></em>导出</a>
+    </div>
+  </div>
+  <div class="panel-body bt" id="print-container">
+    {% for o in signTable %}
+    <table class="table table-bordered">
+      <thead class="bt">
+        <tr>
+          <td class="text-center">姓名</td>
+          {% for i in o.columnTitleList %}
+          <td class="text-center">{{i}}</td>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in o.rowList %}
+        <tr>
+          <td class="text-center"><a href="/project/sign_user2?user_id={{p.user_id}}&project_id={{project.id}}">{{p.title}}</a></td>
+          {% for i in o.columnTitleList %}
+          <td class="text-center">
+            {{p.columnList[i] or '-'}}
+          </td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="/static/vendor/html2canvas/html2canvas.js"></script>
+<script>
+$(function(){
+  html2canvas(document.getElementById('print-container')).then(function(canvas) {
+    var dataUrl = canvas.toDataURL();
+    $('.btn-export').attr('href',dataUrl);
+    var name = $('#table-name').text();
+    $('.btn-export').attr('download',name+'.png');
+
+    $('.btn-print').click(function(){
+      var printWindow = window.open(dataUrl);
+      printWindow.document.write('<img src="'+dataUrl+'" />')
+      printWindow.print();
+    })
+  });
+})
+</script>
+{% endblock %}

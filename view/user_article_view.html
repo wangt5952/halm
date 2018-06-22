@@ -1,0 +1,33 @@
+{% extends "./user_base.html" %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-md-10 col-md-offset-1">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        {{item.name}}
+        <span class="pull-right">来源:{{item.origin}}</span>
+      </div>
+      <div class="panel-body bt">
+        {{item.content|safe}}
+      </div>
+      <div class="panel-footer">
+        {% if item.link %}
+        <a target="_blank" href="{{item.link}}" class="btn btn-default">
+          <em class="fa fa-external-link fa-fw"></em> <span>原文链接</span>
+        </a>
+        {% endif %}
+
+        {% for o in attachList %}
+        <a href="/user/download?id={{o.id}}" class="btn btn-default">
+          <em class="fa fa-paperclip fa-fw"></em> <span>{{o.name}}</span>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}

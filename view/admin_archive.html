@@ -1,0 +1,112 @@
+{% extends "./admin_base.html" %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-12">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <a class="btn btn-info"
+        {% if http.query.id %}
+        href="/admin/archive_folder?parent_id={{http.query.id}}"
+        {% else %}
+        href="/admin/archive_folder?project_id={{pageConfig.project.id}}"
+        {% endif %}
+        >
+          <em class="fa fa-plus fa-fw"></em><span>新建目录</span>
+        </a>
+
+        {% if http.query.id %}
+        <span class="btn btn-info fileinput-button" data-url="/admin/archive_upload?id={{http.query.id}}">
+          <em class="fa fa-upload fa-fw"></em><span>上传文档</span>
+          <input type="file" name="files[]" multiple>
+        </span>
+        {% endif %}
+      </div>
+      <div class="panel-body table-responsive">
+        <table id="datatable1" class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>名称</th>
+              <th>类型</th>
+              <th>创建时间</th>
+              <th>创建者</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="/static/vendor/datatables/media/js/jquery.dataTables.min.js"></script>
+<script src="/static/vendor/datatables-colvis/js/dataTables.colVis.js"></script>
+<script src="/static/vendor/datatables/media/js/dataTables.bootstrap.js"></script>
+<script src="/static/vendor/jquery-ui/ui/widget.js"></script>
+<script src="/static/vendor/blueimp-file-upload/js/jquery.fileupload.js"></script>
+<script>
+$(function(){
+
+  var i = 0;
+  $('.fileinput-button').fileupload({
+    send:function(){
+      i++;
+    },
+    done:function(e, data){
+      i--;
+      if(!i){
+        window.location.reload();
+      }
+
+    }
+  })
+
+  $('#datatable1').dataTable({
+    {% if http.query.id %}
+    'ajax':'/admin/archive?id={{http.query.id}}',
+    {% else %}
+    'ajax':'/admin/archive?project_id={{pageConfig.project.id}}',
+    {% endif %}
+    'columns':[
+      {'data':'name', render:function(data, display, row){
+
+        return ''
+          + (row.hash ? '<a href="/admin/archive_view?id='+row.id+'">' : '<a href="/admin/archive?id='+row.id+'">')
+          + (row.color && row.icon ? ''
+            + '<span class="fa-stack">'
+            + '<em class="fa fa-circle fa-stack-2x '+row.color+'"></em>'
+            + '<em class="fa '+row.icon+' fa-stack-1x fa-inverse text-white"></em>'
+            + '</span>'
+           : '' )
+          + data
+          + '</a>';
+      }},
+      {'data':'type'},
+      {'data':'create_time'},
+      {'data':'user_name'},
+      {'data':'id', orderable:false, render:function(data, display, row){
+        return ''
+          + (row.hash ? '' : ' <a href="/admin/archive_folder?id='+data+'" class="btn btn-info btn-xs"><em class="fa fa-edit fa-fw"></em>编辑</a>')
+          + ' <a href="/admin/archive_download?id='+data+'" target="_blank" class="btn btn-info btn-xs"><em class="fa fa-download fa-fw"></em>下载</a>';
+      }}
+    ],
+    'columnDefs':[
+      {targets:'_all',defaultContent:'-'}
+    ],
+    order:[[2,'desc']],
+    'serverSide':true,
+    'stateSave':true,
+    'language':{'url':'/static/vendor/datatables/i18n/Chinese.json'}
+  });
+})
+</script>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="/static/vendor/datatables-colvis/css/dataTables.colVis.css">
+<link rel="stylesheet" href="/static/vendor/datatables/media/css/dataTables.bootstrap.css">
+<link rel="stylesheet" href="/static/vendor/dataTables.fontAwesome/index.css">
+<link rel="stylesheet" href="/static/vendor/blueimp-file-upload/css/jquery.fileupload.css">
+{% endblock %}

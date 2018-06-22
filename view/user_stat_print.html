@@ -1,0 +1,186 @@
+{% extends "./print_base.html" %}
+
+{% block content %}
+
+<div class="panel panel-default">
+  <div class="panel-heading hidden-print">
+    <button type="button" class="btn btn-info btn-print"><em class="fa fa-print fa-fw"></em>打印</button>
+    <button type="button" class="btn btn-info btn-close"><em class="fa fa-print fa-fw"></em>关闭</button>
+  </div>
+  <div class="panel-body bt" id="print-container">
+    <div class="text-center">
+      <h2>
+        {{year.name}}{{area.name}}工程建设进度统计表
+        {% if type %}
+        （{{type.name}}）
+        {% endif %}
+      </h2>
+    </div>
+    <div class="pull-right">单位：万元</div>
+    <table class="table table-bordered">
+      <thead class="bt">
+        <tr>
+          <th class="text-center" rowspan="2">县（区）别</th>
+          <th colspan="3" width="190px" class="text-center">合计</th>
+          {% for o in typeList %}
+          <th colspan="3" width="190px" class="text-center">
+            {{o.name}}
+          </th>
+          {% endfor %}
+        </tr>
+        <tr>
+          <th width="60px" class="text-center">总投资</th>
+          <th width="75px" class="text-center">完成投资</th>
+          <th width="55px" class="text-center">工程进度</th>
+          {% for o in typeList %}
+          <th width="60px" class="text-center">总投资</th>
+          <th width="75px" class="text-center">完成投资</th>
+          <th width="55px" class="text-center">工程进度</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="text-center">全市合计</td>
+          {% set tzgm, wctz, gcjd, xmgs = 0 %}
+          {% for i in  projectList %}
+          {% set tzgm = tzgm + (i.tzgm or 0) %}
+          {% set wctz = wctz + (i.wctz or 0) %}
+          {% set gcjd = gcjd + (i.progress or 0)%}
+          {% set xmgs = xmgs + 1 %}
+          {% endfor %}
+          <th class="text-center">{{tzgm if xmgs else '-'}}</th>
+          <th class="text-center">{{wctz if xmgs else '-'}}</th>
+          <th class="text-center">{{(gcjd/xmgs)|round + '%' if xmgs else '-'}}</th>
+          {% for o in typeList %}
+          {% set tzgm, wctz, gcjd, xmgs = 0 %}
+          {% for i in  projectList %}
+          {% if i.type_1 == o.id or i.type_id == o.id%}
+          {% set tzgm = tzgm + (i.tzgm or 0) %}
+          {% set wctz = wctz + (i.wctz or 0) %}
+          {% set gcjd = gcjd + (i.progress or 0)%}
+          {% set xmgs = xmgs + 1 %}
+          {% endif %}
+          {% endfor %}
+          <th class="text-center" data-chart-label="{{o.name}}" data-chart-data="{{tzgm}}" data-chart-id="chart-type">
+            {% if xmgs %}
+            {{tzgm}}
+            {% else %}
+            -
+            {% endif %}
+          </th>
+          <th class="text-center">{{wctz if xmgs else '-'}}</th>
+          <th class="text-center">{{(gcjd/xmgs)|round + '%' if xmgs else '-'}}</th>
+          {% endfor %}
+        </tr>
+
+        {% for p in areaList %}
+        <tr>
+          <td class="text-center">{{p.name}}</td>
+          {% set tzgm, wctz, gcjd, xmgs = 0 %}
+          {% for i in projectList %}
+          {% if i.area_id == p.id %}
+          {% set tzgm = tzgm + (i.tzgm or 0) %}
+          {% set wctz = wctz + (i.wctz or 0) %}
+          {% set gcjd = gcjd + (i.progress or 0)%}
+          {% set xmgs = xmgs + 1 %}
+          {% endif %}
+          {% endfor %}
+          <th class="text-center" data-chart-label="{{p.name}}" data-chart-data="{{tzgm}}" data-chart-id="chart-area">
+            {% if xmgs %}
+            {{tzgm if xmgs else '-'}}
+            {% else %}
+            -
+            {% endif %}
+          </th>
+          <th class="text-center">{{wctz if xmgs else '-'}}</th>
+          <th class="text-center">{{(gcjd/xmgs)|round + '%' if xmgs else '-'}}</th>
+          {% for o in typeList %}
+          {% set tzgm, wctz, gcjd, xmgs = 0 %}
+          {% for i in  projectList %}
+          {% if (i.type_1 == o.id or i.type_id == o.id) and i.area_id == p.id %}
+          {% set tzgm = tzgm + (i.tzgm if i.tzgm else 0) %}
+          {% set wctz = wctz + (i.wctz if i.wctz else 0) %}
+          {% set gcjd = gcjd + (i.progress or 0)%}
+          {% set xmgs = xmgs + 1 %}
+          {% endif %}
+          {% endfor %}
+          <th class="text-center">
+            {% if xmgs %}
+            {{tzgm}}
+            {% else %}
+            -
+            {% endif %}
+          </th>
+          <th class="text-center">{{wctz if xmgs else '-'}}</th>
+          <th class="text-center">{{(gcjd/xmgs)|round + '%' if xmgs else '-'}}</th>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="panel-body bt">
+    <div class="row">
+      <div class="col-sm-6 text-center">
+        <div>各类项目总投资比例</div>
+        <div id="chart-type" class="chart-pie flot-chart"></div>
+      </div>
+      <div class="col-sm-6 text-center">
+        <div>各区县总投资比例</div>
+        <div id="chart-area" class="chart-pie flot-chart"></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block script %}
+<script src="/static/vendor/Flot/jquery.flot.js"></script>
+<script src="/static/vendor/flot.tooltip/js/jquery.flot.tooltip.min.js"></script>
+<script src="/static/vendor/Flot/jquery.flot.resize.js"></script>
+<script src="/static/vendor/Flot/jquery.flot.pie.js"></script>
+<script src="/static/vendor/Flot/jquery.flot.time.js"></script>
+<script src="/static/vendor/Flot/jquery.flot.categories.js"></script>
+<script src="/static/vendor/flot-spline/js/jquery.flot.spline.min.js"></script>
+<script>
+$(function(){
+
+  var cds = {};
+  $('[data-chart-label]').each(function(){
+    var $this = $(this);
+    var label = $this.data('chart-label');
+    var data = $this.data('chart-data');
+    var id = $this.data('chart-id');
+    var ds = cds[id] || [];
+    ds.push({
+      label:label, data:data, color:'#'+('00000'+(Math.random()*0x1000000<<0).toString(16)).slice(-6)
+    })
+    cds[id] = ds;
+  });
+
+  var options = {
+    series: {
+      pie: {
+        show: true
+      }
+    },
+    legend: { show: false }
+  };
+
+  _.each(cds, function(o,k){
+    $('#'+k).each(function(){
+      $.plot(this, o, options);
+    })
+  })
+
+  $('.btn-print').click(function(){
+    window.print();
+  })
+
+  $('.btn-close').click(function(){
+    window.close();
+  })
+
+})
+</script>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends "./user_base.html" %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-12">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <a class="btn btn-info" href="/user/docflow_edit">
+          <em class="fa fa-plus fa-fw"></em><span>发送公文</span>
+        </a>
+
+        <a href="/user/docflow?kind=1" class="btn {{'btn-default' if 1 == (http.query.kind or 1) else 'btn-info'}}">
+          <em class="fa fa-question fa-fw"></em><span>待办公文</span>
+        </a>
+        <a href="/user/docflow?kind=2" class="btn {{'btn-default' if 2 == http.query.kind else 'btn-info'}}">
+          <em class="fa fa-exclamation fa-fw"></em><span>已办公文</span>
+        </a>
+        <a href="/user/docflow?kind=3" class="btn {{'btn-default' if 3 == http.query.kind else 'btn-info'}}">
+          <em class="fa fa-send fa-fw"></em><span>已发公文</span>
+        </a>
+      </div>
+      <div class="panel-body">
+         <table id="datatable1" class="table table-striped table-hover">
+            <thead>
+               <tr>
+                 <th>收件人</th>
+                 <th>发件人</th>
+                 <th>标题</th>
+                 <th>发送时间</th>
+                 {% if http.query.kind == 3 %}
+                 <th>公文状态</th>
+                 {% endif %}
+                 <th>操作</th>
+               </tr>
+            </thead>
+         </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="/static/vendor/datatables/media/js/jquery.dataTables.min.js"></script>
+<script src="/static/vendor/datatables-colvis/js/dataTables.colVis.js"></script>
+<script src="/static/vendor/datatables/media/js/dataTables.bootstrap.js"></script>
+<script>
+function del(id){
+  $.ajax({
+    url: '/user/docflow_user_edit',
+    type: 'POST',
+    data: {oper:'del',id:id},
+    success: function(resp) {
+      window.location.reload();
+    }
+  });
+}
+$(function(){
+  $('#datatable1').dataTable({
+    'ajax':'/user/docflow?kind={{http.query.kind or 1}}',
+    'columns':[
+      {'data':'to_user_name', orderable:false},
+      {'data':'user_name', orderable:false},
+      {'data':'name'},
+      {'data':'create_time', orderable:false},
+      {% if http.query.kind == 3 %}
+      {'data':'status', orderable:false, render:function(data){
+        if(data == '0') return '通过';
+        else if(data == '1') return '拒绝';
+        else return '处理中';
+      }},
+      {% endif %}
+      {'data':'id', orderable:false, render:function(data, display, row){
+
+        {% if http.query.kind == 1 or not http.query.kind %}
+        return ' <a href="/user/docflow_reply?duid='+row.duid+'" class="btn btn-info btn-xs"><em class="fa fa-reply fa-fw"></em>回复</a>'
+        +' <a href="/user/docflow_reply?forward=1&duid='+row.duid+'" class="btn btn-info btn-xs"><em class="fa fa-share fa-fw"></em>转发</a>'
+        +' <a href="javascript:del('+row.duid+')" target="_blank" class="btn btn-danger btn-xs"><em class="fa fa-close fa-fw"></em>删除</a>';
+        {% elif http.query.kind == 2 %}
+        let processText = '<em class="fa fa-reply fa-fw"></em>查看';
+        let href = '/user/docflow_reply?duid='+row.duid;
+        href += '&view=1';
+        return ' <a href="'+href+'" class="btn btn-info btn-xs">'+processText+'</a>';
+        {% else %}
+        let processText = '<em class="fa fa-eye fa-fw"></em>查看';
+        let href = '/user/docflow_reply?id='+data;
+        href += '&view=1';
+        return ' <a href="'+href+'" class="btn btn-info btn-xs">'+processText+'</a>';
+        {% endif %}
+
+      }}
+    ],
+    'columnDefs':[
+      {targets:'_all',defaultContent:'-'}
+    ],
+    'serverSide':true,
+    'stateSave':true,
+    'language':{'url':'/static/vendor/datatables/i18n/Chinese.json'}
+  });
+})
+</script>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="/static/vendor/datatables-colvis/css/dataTables.colVis.css">
+<link rel="stylesheet" href="/static/vendor/datatables/media/css/dataTables.bootstrap.css">
+<link rel="stylesheet" href="/static/vendor/dataTables.fontAwesome/index.css">
+{% endblock %}

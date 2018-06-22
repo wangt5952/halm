@@ -1,0 +1,137 @@
+{% extends "./user_base.html" %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-12">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <div class="btn-group">
+          <button data-toggle="dropdown" class="btn btn-default">
+            {{year.name}} <b class="caret"></b>
+          </button>
+          <ul role="menu" class="dropdown-menu">
+            {% for o in yearList %}
+            <li><a href="/user/project?year={{o.value}}&area={{area.value}}&type={{type.value}}&subtype={{subtype.value}}">{{o.name}}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <div class="btn-group">
+          <button data-toggle="dropdown" class="btn btn-default">
+            {{area.selected_name or area.name}} <b class="caret"></b>
+          </button>
+          <ul role="menu" class="dropdown-menu">
+            {% for o in areaList %}
+            <li><a href="/user/project?year={{year.value}}&area={{o.value}}&type={{type.value}}&subtype={{subtype.value}}">{{o.name}}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <div class="btn-group">
+          <button data-toggle="dropdown" class="btn btn-default">
+            {{type.selected_name or type.name}} <b class="caret"></b>
+          </button>
+          <ul role="menu" class="dropdown-menu">
+            {% for o in typeList %}
+            <li><a href="/user/project?year={{year.value}}&area={{area.value}}&type={{o.value}}&subtype={{subtype.value}}">{{o.name}}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <div class="btn-group">
+          <button data-toggle="dropdown" class="btn btn-default">
+            {{subtype.selected_name or subtype.name}} <b class="caret"></b>
+          </button>
+          <ul role="menu" class="dropdown-menu">
+            {% for o in subtypeList %}
+            <li><a href="/user/project?year={{year.value}}&area={{area.value}}&type={{type.value}}&subtype={{o.value}}">{{o.name}}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <div class="btn-group">
+          <button data-toggle="dropdown" class="btn btn-default">
+            {{status.selected_name or status.name}} <b class="caret"></b>
+          </button>
+          <ul role="menu" class="dropdown-menu">
+            {% for o in statusList %}
+            <li><a href="/user/project?year={{year.value}}&area={{area.value}}&type={{type.value}}&status={{o.value}}">{{o.name}}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <div class="btn-group pull-right">
+          {% if pageConfig.auth['cp'] %}
+          <a href="/user/project_edit" class="btn btn-info">
+            <em class="fa fa-plus fa-fw"></em><span>创建项目</span>
+          </a>
+          {% endif %}
+        </div>
+
+      </div>
+      <div class="panel-body table-responsive">
+        <table id="datatable1" class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th style="min-width:200px;">项目名称</th>
+              <th>开工时间</th>
+              <th>计划完成时间</th>
+              <th>总投资(万元)</th>
+              <th>到位投资(万元)</th>
+              <th>完成投资(万元)</th>
+              <th>形象进度(%)</th>
+              <th>计量金额(万元)</th>
+              <th>计量进度(%)</th>
+              <th>支付金额(万元)</th>
+              <th>支付进度(%)</th>
+              <th>完工验收时间</th>
+              <th>竣工验收时间</th>
+              <th>工程状态</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="/static/vendor/datatables/media/js/jquery.dataTables.min.js"></script>
+<script src="/static/vendor/datatables-colvis/js/dataTables.colVis.js"></script>
+<script src="/static/vendor/datatables/media/js/dataTables.bootstrap.js"></script>
+<script>
+$(function(){
+  $('#datatable1').dataTable({
+    'ajax':'/user/project?status={{status.value}}&year={{year.value}}&area={{area.value}}&type={{type.value}}&subtype={{subtype.value}}',
+    'columns':[
+      {'data':'name', render: function(data,display,row){
+        return ' <a href="/project?id='+row.id+'">'+data+'</a>';
+      }},
+      {'data':'kg_time'},
+      {'data':'jhwc_time'},
+      {'data':'tzgm'},
+      {'data':'dwtz'},
+      {'data':'wctz'},{'data':'xxjd', render:function(data,display, row){ return row.tzgm ? (row.wctz / row.tzgm * 100).toFixed(0) : 0}},
+      {'data':'jlje'},{'data':'jljd'},
+      {'data':'zfje'},{'data':'zfjd'},
+      {'data':'wgys_time'},{'data':'jgys_time'},
+
+      {'data':'status'}
+    ],
+    'columnDefs':[
+      {targets:'_all',defaultContent:'-'}
+    ],
+    'serverSide':true,
+    'stateSave':true,
+    'language':{'url':'/static/vendor/datatables/i18n/Chinese.json'}
+  });
+})
+</script>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="/static/vendor/datatables-colvis/css/dataTables.colVis.css">
+<link rel="stylesheet" href="/static/vendor/datatables/media/css/dataTables.bootstrap.css">
+<link rel="stylesheet" href="/static/vendor/dataTables.fontAwesome/index.css">
+{% endblock %}

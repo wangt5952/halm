@@ -1,0 +1,65 @@
+{% extends "./project_base.html" %}
+
+{% block content %}
+{% for o in signList %}
+<div id="accordion" role="tablist" aria-multiselectable="true" class="panel-group">
+  <div class="panel panel-default">
+    <div id="heading_{{loop.index}}" role="tab" class="panel-heading">
+      <a class="h5" data-toggle="collapse" data-parent="#accordion" href="#collapse_{{loop.index}}" aria-expanded="true" aria-controls="collapse_{{loop.index}}">
+        {{o.title}}
+      </a>
+    </div>
+    <div id="collapse_{{loop.index}}" role="tabpanel" aria-labelledby="heading_{{loop.index}}" class="panel-collapse collapse {{'in' if loop.index == 1}}">
+      <div class="panel-body">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>时间</th>
+              <th>地点</th>
+              <th>图片</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in o.list %}
+            <tr>
+              <td>{{p.create_time}}</td>
+              <td>{{p.address}}</td>
+              <td>
+                <div>
+                {% for q in p.attach_id %}
+                <a href="/index/image?id={{q}}" class="inline" data-gallery>
+                  <img src="/index/image?id={{q}}" class="img-thumbnail thumb80">
+                </a>
+                {% endfor %}
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+{% endblock %}
+
+{% block body %}
+<div id="blueimp-gallery" class="blueimp-gallery">
+    <div class="slides"></div>
+    <h3 class="title"></h3>
+    <a class="prev">‹</a>
+    <a class="next">›</a>
+    <a class="close">×</a>
+    <a class="play-pause"></a>
+    <ol class="indicator"></ol>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="/static/vendor/blueimp-gallery/js/jquery.blueimp-gallery.min.js"></script>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="/static/vendor/blueimp-gallery/css/blueimp-gallery.min.css">
+{% endblock %}

@@ -1,0 +1,117 @@
+{% extends "./admin_base.html" %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-12">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <a class="btn btn-info"
+        {% if pageConfig.company %}
+        href="/admin/user_edit?company_id={{pageConfig.company.id}}"
+        {% else %}
+        href="/admin/user_edit"
+        {% endif %}
+        >
+          <em class="fa fa-plus fa-fw"></em><span>添加人员</span>
+        </a>
+        <a href="/admin/user_type" class="btn btn-info">
+          <em class="fa fa-cubes fa-fw"></em><span>人员类型</span>
+        </a>
+      </div>
+      <div class="panel-body table-responsive">
+        <table id="datatable1" class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>姓名</th>
+              <th>性别</th>
+              <th>身份证号</th>
+              <th>工作单位</th>
+              <th>职务</th>
+              <th>职称</th>
+              <th>联系号码</th>
+              <th>用户名</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="/static/vendor/datatables/media/js/jquery.dataTables.min.js"></script>
+<script src="/static/vendor/datatables-colvis/js/dataTables.colVis.js"></script>
+<script src="/static/vendor/datatables/media/js/dataTables.bootstrap.js"></script>
+<script src="/static/vendor/sweetalert/dist/sweetalert.min.js"></script>
+<script>
+function del(id){
+  swal({
+    title: '确认删除编号是'+id+'的记录?',
+    type: "warning",
+    showCancelButton: true,
+    cancelButtonText: '取消',
+    confirmButtonColor: "#DD6B55",
+    confirmButtonText: "是的，删除它",
+    closeOnConfirm: false
+  },
+  function(){
+    $.ajax({
+      url: '/admin/user_edit',
+      type: 'POST',
+      data: {oper:'del',id:id},
+      success: function(resp) {
+        if (resp.errno == 0) {
+          swal({title:'操作成功！',type:'success'},function () {
+            setTimeout(function(){
+              window.location.reload();
+            },100);
+          });
+        } else {
+          alert(resp.errmsg);
+        }
+      }
+    });
+  });
+}
+$(function(){
+  $('#datatable1').dataTable({
+    {% if pageConfig.company %}
+    'ajax':'/admin/user?company_id={{pageConfig.company.id}}',
+    {% else %}
+    'ajax':'/admin/user',
+    {% endif %}
+    'columns':[
+      {'data':'name', render:function(data, display, row){
+        return '<a href="/admin/user_edit?id='+row.id+'">'+data+'</a>'
+      }},
+      {'data':'sex'},
+      {'data':'idno'},
+      {'data':'company_name'},
+      {'data':'job'},
+      {'data':'title'},
+      {'data':'mobile'},
+      {'data':'username'},
+      {'data':'id', orderable:false, render:function(data){
+        return '<a href="/admin/user_edit?id='+data+'" class="btn btn-info btn-xs"><em class="fa fa-edit fa-fw"></em>编辑</a>'
+        + ' <a href="javascript:del('+data+')" class="btn btn-danger btn-xs"><em class="fa fa-close fa-fw"></em>删除</a>';
+      }}
+    ],
+    'columnDefs':[
+      {targets:'_all',defaultContent:'-'}
+    ],
+    'serverSide':true,
+    'stateSave':true,
+    'language':{'url':'/static/vendor/datatables/i18n/Chinese.json'}
+  });
+})
+</script>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="/static/vendor/datatables-colvis/css/dataTables.colVis.css">
+<link rel="stylesheet" href="/static/vendor/datatables/media/css/dataTables.bootstrap.css">
+<link rel="stylesheet" href="/static/vendor/dataTables.fontAwesome/index.css">
+<link rel="stylesheet" href="/static/vendor/sweetalert/dist/sweetalert.css">
+{% endblock %}

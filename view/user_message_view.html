@@ -1,0 +1,62 @@
+{% extends "./user_base.html" %}
+
+{% block content %}
+
+<ul class="timeline">
+  <li>
+     <a href="/user/message_edit?tid={{item.id}}" class="timeline-badge">
+        <em class="fa fa-plus"></em>
+     </a>
+  </li>
+  {% for o in itemList %}
+  {% if o.type == 'sep' %}
+    <li data-datetime="{{o.title}}" class="timeline-separator"></li>
+  {% else %}
+  <li class="{{'timeline-inverted' if loop.index % 2 != 0}}">
+    <div class="timeline-badge primary">
+       <em class="fa fa-book"></em>
+    </div>
+    <div class="timeline-panel">
+       <div class="popover {{'right' if loop.index % 2 != 0}}">
+          <h4 class="popover-title {{'bg-danger' if item.id == o.id else 'bg-primary'}}">
+            发件人：{{o.from_user_name}}
+          </h4>
+          <div class="arrow"></div>
+          <div class="popover-content">
+            <div>
+              收件人：{{o.user_name}}
+            </div>
+            <div>
+              发文时间：{{o.create_time}}
+            </div>
+            <div>
+              收文时间：{{o.view_time}}
+            </div>
+
+            <div>
+              备注：{{o.content|safe}}
+            </div>
+
+            {% if o.attachList.length %}
+            <div>
+              附件：{% for o in o.attachList %}
+              <a href="/user/download?id={{o.id}}" class="btn btn-default">
+                <em class="fa fa-paperclip fa-fw"></em> <span>{{o.name}}</span>
+              </a>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+       </div>
+    </div>
+  </li>
+  {% endif %}
+  {% endfor %}
+  <li class="timeline-end">
+    <a href="javascript:;" class="timeline-badge">
+      <em class="fa fa-circle"></em>
+    </a>
+  </li>
+</ul>
+
+{% endblock %}
